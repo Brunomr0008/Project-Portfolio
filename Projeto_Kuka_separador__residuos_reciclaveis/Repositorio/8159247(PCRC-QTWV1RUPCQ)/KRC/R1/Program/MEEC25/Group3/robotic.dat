@@ -1,0 +1,91 @@
+﻿&ACCESS RVP
+DEFDAT robotic
+;FOLD EXTERNAL DECLARATIONS;%{PE}%MKUKATPBASIS,%CEXT,%VCOMMON,%P
+
+; =================================================== ;
+;FOLD BASISTECH EXT;%{PE}%MKUKATPBASIS,%CEXT,%VEXT,%P
+; =================================================== ;
+
+EXT  BAS (BAS_COMMAND  :IN,REAL  :IN )
+
+DECL INT XTOOLBASE = 1
+DECL INT XTOOL = 3
+
+;ENDFOLD (BASISTECH EXT)
+ 
+;FOLD USER EXT;%{E}%MKUKATPUSER,%CEXT,%VEXT,%P
+;Make your modifications here
+ 
+; ==================================== ;
+; Fold Declaração de variáveis Globais ;
+; ==================================== ;
+
+DECL POS PontoRecolhaArray[3]
+DECL POS PontoDepositoArray[3]
+DECL POS PontoIntermedioArray[6]
+
+DECL INT count[3]; índices: 1 = VERDE, 2 = AMARELO, 3 = AZUL
+
+DECL BOOL REINICIAR
+;ENDFOLD
+
+; ==================================== ;
+; FOLD Definição dos Inputs e Outputs ;
+; ==================================== ;
+SIGNAL B_Branco $IN[20]
+SIGNAL B_VERMELHO $IN[21]
+SIGNAL B_PRETO $IN[22]
+
+SIGNAL IN_POS1_VERDE $IN[11]
+SIGNAL IN_POS1_AMARELO    $IN[12]
+SIGNAL IN_POS1_AZUL   $IN[13]
+
+SIGNAL IN_POS2_VERDE $IN[14]
+SIGNAL IN_POS2_AMARELO    $IN[15]
+SIGNAL IN_POS2_AZUL   $IN[16]
+
+SIGNAL IN_POS3_VERDE $IN[17]
+SIGNAL IN_POS3_AMARELO    $IN[18]
+SIGNAL IN_POS3_AZUL   $IN[19]
+
+SIGNAL LARANJA $OUT[23]
+SIGNAL VERDE $OUT[22]
+SIGNAL AZUL $OUT[21]
+;ENDFOLD
+
+; ============= ;
+; FOLD Posições
+; ============= ;
+
+; Posições de Recolha
+DECL POS P1_Recolha = {X 65.5, Y 224, Z -140, C 26}   ; P1
+DECL POS P2_Recolha = {X 64.5, Y 152.5, Z -140, C 26} ; P2
+DECL POS P3_Recolha = {X 63.5, Y 82, Z -140, C 26}    ; P3
+
+; Posições de Depósito
+DECL POS P1_Deposito = {X 696.5, Y 228.3, Z -140, C 3.5}    ; Verde (Junto)
+DECL POS P2_Deposito = {X 695.5, Y 141.5, Z -140, C 3.5}    ; Amarelo (Meio)
+DECL POS P3_Deposito = {X 695.5, Y 55, Z -140, C 3.5}       ; Azul (Fundo)
+
+; Posições Intermédias
+DECL POS P1_Intermedia = {X 65.5, Y 224, Z -80, C 86}    ;P1
+DECL POS P2_Intermedia = {X 64.5, Y 152.5, Z -80, C 86}  ;P2
+DECL POS P3_Intermedia = {X 63.5, Y 82, Z -80, C 86}     ;P3
+DECL POS P4_Intermedia = {X 696.5, Y 228.3, Z -120, C 63.5}      ; Verde
+DECL POS P5_Intermedia = {X 695.5, Y 141.5, Z -120, C 63.5}      ; Amarelo
+DECL POS P6_Intermedia = {X 695.5, Y 55, Z -120, C 63.5}         ; Azul
+; ENDFOLD
+
+;ENDFOLD (USER EXT)
+;ENDFOLD (EXTERNAL DECLARATIONS)
+
+; ======================= ;
+; FOLD Variaveis Externas ;
+; ======================= ;
+DECL PDAT PDAT1 = {APO_MODE #CDIS, APO_DIST 50, VEL 100, ACC 50, GEAR_JERK 50.0, EXAX_IGN 0}
+DECL PDAT PDAT2 = {APO_MODE #CDIS, APO_DIST 5, VEL 50, ACC 50, GEAR_JERK 50.0, EXAX_IGN 0}
+
+DECL FDAT FPontoBase = {BASE_NO 1,TOOL_NO 3,IPO_FRAME #BASE,POINT2[] " "}
+DECL FDAT FPontoDeposito = {BASE_NO 1,TOOL_NO 3,IPO_FRAME #BASE,POINT2[] " "}
+; ENDFOLD
+ENDDAT

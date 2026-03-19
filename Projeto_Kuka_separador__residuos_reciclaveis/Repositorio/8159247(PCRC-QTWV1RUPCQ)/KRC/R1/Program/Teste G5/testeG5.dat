@@ -1,0 +1,70 @@
+&ACCESS RVO
+DEFDAT testeG5
+
+;FOLD EXTERNAL DECLARATIONS;%{PE}%MKUKATPBASIS,%CEXT,%VCOMMON,%P
+;FOLD BASISTECH EXT;%{PE}%MKUKATPBASIS,%CEXT,%VEXT,%P
+   
+EXT BAS (BAS_COMMAND :IN,REAL :IN )
+
+DECL INT XTOOLBASE = 2 ; ou o número real da sua base
+DECL INT XTOOL = 1 
+
+DECL INT sequencia[3]
+DECL INT SUCCESS
+
+;ENDFOLD (BASISTECH EXT)
+
+;FOLD USER EXT;%{E}%MKUKATPUSER,%CEXT,%VEXT,%P
+;Make your modifications here
+
+
+;PONTO recolha
+;DECL POS recolha1 = {X 0.00, Y 0.00, Z 0.00, A 0.00} 
+DECL POS recolha1 = {X 164.17, Y -44.90, Z 204.59, C 0.0} 
+DECL POS recolha2 = {X 164.17, Y -44.90, Z 137.68, C 00.0} 
+DECL POS recolha3 = {X 164.17, Y -44.90, Z 137.68, C 45.00};z recolha
+DECL POS recolha4 = {X 164.17, Y -44.90, Z 204.59, C 0.0} 
+
+
+; PONTO DE DROP Circulo
+DECL POS circulo1 = {X -156.33, Y -104.80, Z 204.59, C 0.0} 
+DECL POS circulo2 = {X -156.33, Y -104.80, Z 76.86, C 00.0}  ;z entrega 
+DECL POS circulo3 = {X -156.33, Y -104.80, Z 76.86, C -45.00}
+DECL POS circulo4 = {X -156.33, Y -104.80, Z 204.59, C 0.0} 
+
+
+
+
+
+
+;desce 30
+
+; PONTO DE DROP Hexagono
+DECL POS Hexagono1 = {X 69.51, Y 217.21, Z 84.96, A 0.00} 
+DECL POS Hexagono2 = {X 69.51, Y 217.21, Z 84.96, A 00.00} 
+DECL POS Hexagono3 = {X 69.51, Y 217.21, Z 84.96, A 0.00}
+DECL POS Hexagono4 = {X 69.51, Y 217.21, Z 84.96, A 0.00} 
+
+; PONTO DE DROP quadrado
+DECL POS Quadrado1 = {X 74.50, Y 339.02, Z 84.96, A 0.00} 
+DECL POS Quadrado2 = {X 74.50, Y 339.02, Z 84.96, A 0.00} 
+DECL POS Quadrado3 = {X 74.50, Y 339.02, Z 84.96, A 0.00}
+DECL POS Quadrado4 = {X 74.50, Y 339.02, Z 84.96, A 0.00} 
+
+
+
+;Testes Axiais
+;DECL AXIS P_AXIAL_1 = {A1 -23.79, A2 -71.84, A3 -4.37, A4 6.44, A5 0.0, A6 0.0}  ; Exemplo de um ponto axial com 6 eixos
+;DECL AXIS P_AXIAL_2 = {A1 0.0, A2 10.0, A3 -3.0, A4 0.0, A5 0.0, A6 0.0}
+
+
+;ENDFOLD (USER EXT)
+;ENDFOLD (EXTERNAL DECLARATIONS)
+DECL MODULEPARAM_T LAST_TP_PARAMS = {PARAMS[] "Kuka.VelocityFieldEnabled=False; Kuka.ColDetectFieldEnabled=False; Kuka.MovementParameterFieldEnabled=False; Kuka.IsAngleEnabled=False; Kuka.PointName=P2; Kuka.FrameData.base_no=0; Kuka.FrameData.tool_no=1; Kuka.FrameData.ipo_frame=#BASE; Kuka.isglobalpoint=False; Kuka.MoveDataPtpName=PDAT1; Kuka.MovementDataPdat.apo_mode=#CDIS; Kuka.MovementDataPdat.apo_dist=500; Kuka.MovementData.vel=2; Kuka.MovementData.acc=100; Kuka.MovementData.exax_ign=0; Kuka.VelocityPtp=100; Kuka.BlendingEnabled=False; Kuka.APXEnabled=False; Kuka.CurrentCDSetIndex=0; Kuka.MoveDataName=CPDAT1; Kuka.MovementData.cb={AUX_PT {ORI #CONSIDER,E1 #CONSIDER,E2 #CONSIDER,E3 #CONSIDER,E4 #CONSIDER,E5 #CONSIDER,E6 #CONSIDER},TARGET_PT {ORI #INTERPOLATE,E1 #INTERPOLATE,E2 #INTERPOLATE,E3 #INTERPOLATE,E4 #INTERPOLATE,E5 #INTERPOLATE,E6 #INTERPOLATE}}; Kuka.MovementData.apo_fac=50; Kuka.MovementData.apo_dist=500; Kuka.MovementData.axis_acc=100; Kuka.MovementData.axis_vel=100; Kuka.MovementData.circ_typ=#BASE; Kuka.MovementData.jerk_fac=50; Kuka.MovementData.ori_typ=#VAR; Kuka.VelocityPath=2"}
+DECL PDAT PPDAT1 = {APO_MODE #CDIS,APO_DIST 500,VEL 100,ACC 100,GEAR_JERK 100.0,EXAX_IGN 0}
+DECL FDAT FP1 = {BASE_NO 2,TOOL_NO 1,IPO_FRAME #BASE,POINT2[] " "}
+DECL E6POS XP1 = { X 666666.666, Y 66.6, Z 666.66, A 6.6, B 66.66, C 666.6, S 0, T 0, E1 0, E2 0, E3 0, E4 0, E5 0, E6 0 }
+DECL LDAT LCPDAT1 = {CB {AUX_PT {ORI #CONSIDER,E1 #CONSIDER,E2 #CONSIDER,E3 #CONSIDER,E4 #CONSIDER,E5 #CONSIDER,E6 #CONSIDER},TARGET_PT {ORI #INTERPOLATE,E1 #INTERPOLATE,E2 #INTERPOLATE,E3 #INTERPOLATE,E4 #INTERPOLATE,E5 #INTERPOLATE,E6 #INTERPOLATE}},APO_FAC 50.0,APO_DIST 500,AXIS_ACC 100.0,AXIS_VEL 100.0,CIRC_TYP #BASE,JERK_FAC 50.0,ORI_TYP #VAR,VEL 2,ACC 100,GEAR_JERK 100.0,EXAX_IGN 0}
+DECL FDAT FP2 = {BASE_NO 2,TOOL_NO 1,IPO_FRAME #BASE,POINT2[] " "}
+DECL E6POS XP2 = { X 666666.666, Y 66.6, Z 666.66, A 6.6, B 66.66, C 666.6, S 0, T 0, E1 0, E2 0, E3 0, E4 0, E5 0, E6 0 }
+ENDDAT

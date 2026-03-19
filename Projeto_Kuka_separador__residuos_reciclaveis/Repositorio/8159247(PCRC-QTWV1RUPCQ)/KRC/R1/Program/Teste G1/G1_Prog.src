@@ -1,0 +1,116 @@
+&ACCESS RVO
+DEF  G1_Prog ( )
+
+   GLOBAL INTERRUPT DECL 3 WHEN $STOPMESS==TRUE DO IR_STOPM ( )
+   INTERRUPT ON 3 
+   BAS (#INITMOV,0 )
+   BAS (#TOOL, XTOOL)
+   BAS (#BASE, XTOOLBASE)
+ 
+ ;Mover PARA HOME
+   SPTP XHOME
+   LOOP 
+      PLC_GET_Pos()
+      Gridplace()
+      SPTP XHOME
+      Clear_Firefly()
+   ENDLOOP
+
+END
+
+DEF PLC_GET_Pos()
+   WAIT FOR $IN[19]
+   WAIT FOR NOT $IN[19]
+   NextPos = 0
+   
+   IF $IN[20]THEN 
+      NextPos=NextPos+1
+   ENDIF
+   IF $IN[21]THEN 
+      NextPos=NextPos+2
+   ENDIF
+   IF $IN[22]THEN 
+      NextPos=NextPos+4
+   ENDIF
+   IF $IN[23]THEN 
+      NextPos=NextPos+8
+   ENDIF   
+END
+
+DEF Gridplace()
+   SWITCH NextPos
+      CASE 0
+         ;insert your code here
+         MoveTo(Matrix_Pos1)
+      CASE 1
+         ;insert your code here
+         MoveTo(Matrix_Pos2)
+      CASE 2
+         ;insert your code here
+         MoveTo(Matrix_Pos3)
+      CASE 3
+         ;insert your code here
+         MoveTo(Matrix_Pos4)
+      CASE 4
+         ;insert your code here
+         MoveTo(Matrix_Pos5)
+      CASE 5
+         ;insert your code here
+         MoveTo(Matrix_Pos6)
+      CASE 6
+         ;insert your code here
+         MoveTo(Matrix_Pos7)
+      CASE 7
+         ;insert your code here
+         MoveTo(Matrix_Pos8)
+      CASE 8
+         ;insert your code here
+         MoveTo(Matrix_Pos9)
+      DEFAULT
+         $OUT[11]=TRUE
+         WAIT FOR $IN[24]
+         WAIT FOR NOT $IN[24]
+         ;insert your code here
+   ENDSWITCH
+END
+
+DEF MoveTo(Position:IN)
+ POS Position
+ RECOLHA.C = 0
+ Position.C = 0
+ 
+ ;IR PARA RECOLHA
+ $OUT[13]=TRUE
+ SPTP RECOLHA WITH $VEL_AXIS[1] = SVEL_JOINT(100.0), $TOOL = STOOL2(FBase), $BASE = SBASE(FBase.BASE_NO), $IPO_MODE = SIPO_MODE(FBase.IPO_FRAME), $LOAD = SLOAD(FBase.TOOL_NO), $ACC_AXIS[1] = SACC_JOINT(PPDAT), $APO = SAPO_PTP(PPDAT), $GEAR_JERK[1] = SGEAR_JERK(PPDAT), $COLLMON_TOL_PRO[1] = USE_CM_PRO_VALUES(0) C_Spl
+ RECOLHA.Z = RECOLHA.Z - Z_Offset
+ LIN RECOLHA
+ RECOLHA.C = RECOLHA.C - Angle_Offset
+ LIN RECOLHA
+ RECOLHA.Z = RECOLHA.Z + Z_Offset
+ LIN RECOLHA
+ ;RECOLHA.C = RECOLHA.C + Angle_Offset
+ ;LIN RECOLHA
+ 
+ ;IR PARA POSITION
+ $OUT[13]=FALSE
+ $OUT[12]=TRUE
+ Position.C = Position.C - Angle_Offset
+ SPTP Position WITH $VEL_AXIS[1] = SVEL_JOINT(100.0), $TOOL = STOOL2(FBase), $BASE = SBASE(FBase.BASE_NO), $IPO_MODE = SIPO_MODE(FBase.IPO_FRAME), $LOAD = SLOAD(FBase.TOOL_NO), $ACC_AXIS[1] = SACC_JOINT(PPDAT), $APO = SAPO_PTP(PPDAT), $GEAR_JERK[1] = SGEAR_JERK(PPDAT), $COLLMON_TOL_PRO[1] = USE_CM_PRO_VALUES(0) C_Spl
+ Position.Z = Position.Z - Z_Offset
+ LIN Position
+ Position.C = Position.C + Angle_Offset
+ LIN Position
+ Position.Z = Position.Z + Z_Offset
+ LIN Position
+ ;Position.C = Position.C + Angle_Offset
+ ;LIN Position
+ 
+ ;
+ RECOLHA.C = RECOLHA.C - Angle_Offset
+END
+
+DEF Clear_Firefly()
+ $OUT[11]=FALSE
+ $OUT[12]=FALSE
+ $OUT[13]=FALSE
+END

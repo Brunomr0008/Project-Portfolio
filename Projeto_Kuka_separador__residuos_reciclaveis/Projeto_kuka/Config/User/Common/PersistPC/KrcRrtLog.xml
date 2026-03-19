@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RobRuntimeLog xsi:noNamespaceSchemaLocation="/Roboter/Config/System/Common/Schemes/RobRuntimeLog.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+   <RobRuntime Date="2024-07-01 19:14" SerialNo="8159247" Runtime="0" />
+   <RobRuntime Date="2024-07-24 18:46" SerialNo="8159247" Runtime="1" />
+   <RobRuntime Date="2025-05-20 20:57" SerialNo="8159247" Runtime="2" />
+   <RobRuntime Date="2025-06-07 18:04" SerialNo="8159247" Runtime="3" />
+   <RobRuntime Date="2025-06-21 13:40" SerialNo="8159247" Runtime="4" />
+   <RobRuntime Date="2025-06-21 18:00" SerialNo="8159247" Runtime="5" />
+   <RobRuntime Date="2025-06-26 19:47" SerialNo="8159247" Runtime="6" />
+</RobRuntimeLog>

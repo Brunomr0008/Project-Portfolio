@@ -1,0 +1,337 @@
+&ACCESS RVO
+&REL 27
+&PARAM EDITMASK = *
+&PARAM TEMPLATE = C:\KRC\Roboter\Template\vorgabe
+&PARAM DISKPATH = KRC:\R1\Program\MEEC25\Group3
+DEF td( )
+;FOLD INI;%{PE}
+  ;FOLD BASISTECH INI
+    GLOBAL INTERRUPT DECL 3 WHEN $STOPMESS==TRUE DO IR_STOPM ( )
+    INTERRUPT ON 3 
+    BAS (#INITMOV,0 )
+  ;ENDFOLD (BASISTECH INI)
+  ;FOLD USER INI
+    ;Make your modifications here
+
+  ;ENDFOLD (USER INI)
+  ;ENDFOLD (INI)
+;=======================================================================
+;============ Movimento Ponto de Recolha 1 -> Balde Amarelo ============
+;=======================================================================
+;FOLD PTP P6 Vel=80 % PDAT6 Tool[2]:Tool_G3 Base[1]:Base_G3 ;%{PE}
+;FOLD Parameters ;%{h}
+;Params IlfProvider=kukaroboter.basistech.inlineforms.movement.old; Kuka.IsGlobalPoint=False; Kuka.PointName=P6; Kuka.BlendingEnabled=False; Kuka.MoveDataPtpName=PDAT6; Kuka.VelocityPtp=80; Kuka.CurrentCDSetIndex=0; Kuka.MovementParameterFieldEnabled=True; IlfCommand=PTP
+;ENDFOLD
+$BWDSTART = FALSE
+PDAT_ACT = PPDAT6
+FDAT_ACT = FP6
+BAS(#PTP_PARAMS, 80.0)
+SET_CD_PARAMS (0)
+PTP XP6
+;ENDFOLD
+
+;FOLD PTP P7 Vel=80 % PDAT7 Tool[2]:Tool_G3 Base[1]:Base_G3 ;%{PE}
+;FOLD Parameters ;%{h}
+;Params IlfProvider=kukaroboter.basistech.inlineforms.movement.old; Kuka.IsGlobalPoint=False; Kuka.PointName=P7; Kuka.BlendingEnabled=False; Kuka.MoveDataPtpName=PDAT7; Kuka.VelocityPtp=80; Kuka.CurrentCDSetIndex=0; Kuka.MovementParameterFieldEnabled=True; IlfCommand=PTP
+;ENDFOLD
+$BWDSTART = FALSE
+PDAT_ACT = PPDAT7
+FDAT_ACT = FP7
+BAS(#PTP_PARAMS, 80.0)
+SET_CD_PARAMS (0)
+PTP XP7
+;ENDFOLD
+
+;FOLD PTP P8 Vel=40 % PDAT8 Tool[2]:Tool_G3 Base[1]:Base_G3 ;%{PE}
+;FOLD Parameters ;%{h}
+;Params IlfProvider=kukaroboter.basistech.inlineforms.movement.old; Kuka.IsGlobalPoint=False; Kuka.PointName=P8; Kuka.BlendingEnabled=False; Kuka.MoveDataPtpName=PDAT8; Kuka.VelocityPtp=40; Kuka.CurrentCDSetIndex=0; Kuka.MovementParameterFieldEnabled=True; IlfCommand=PTP
+;ENDFOLD
+$BWDSTART = FALSE
+PDAT_ACT = PPDAT8
+FDAT_ACT = FP8
+BAS(#PTP_PARAMS, 40.0)
+SET_CD_PARAMS (0)
+PTP XP8
+;ENDFOLD
+
+;FOLD PTP P9 Vel=100 % PDAT9 Tool[2]:Tool_G3 Base[1]:Base_G3 ;%{PE}
+;FOLD Parameters ;%{h}
+;Params IlfProvider=kukaroboter.basistech.inlineforms.movement.old; Kuka.IsGlobalPoint=False; Kuka.PointName=P9; Kuka.BlendingEnabled=False; Kuka.MoveDataPtpName=PDAT9; Kuka.VelocityPtp=100; Kuka.CurrentCDSetIndex=0; Kuka.MovementParameterFieldEnabled=True; IlfCommand=PTP
+;ENDFOLD
+$BWDSTART = FALSE
+PDAT_ACT = PPDAT9
+FDAT_ACT = FP9
+BAS(#PTP_PARAMS, 100.0)
+SET_CD_PARAMS (0)
+PTP XP9
+;ENDFOLD
+
+;FOLD PTP P10 Vel=50 % PDAT10 Tool[2]:Tool_G3 Base[1]:Base_G3 ;%{PE}
+;FOLD Parameters ;%{h}
+;Params IlfProvider=kukaroboter.basistech.inlineforms.movement.old; Kuka.IsGlobalPoint=False; Kuka.PointName=P10; Kuka.BlendingEnabled=False; Kuka.MoveDataPtpName=PDAT10; Kuka.VelocityPtp=50; Kuka.CurrentCDSetIndex=0; Kuka.MovementParameterFieldEnabled=True; IlfCommand=PTP
+;ENDFOLD
+$BWDSTART = FALSE
+PDAT_ACT = PPDAT10
+FDAT_ACT = FP10
+BAS(#PTP_PARAMS, 50.0)
+SET_CD_PARAMS (0)
+PTP XP10
+;ENDFOLD
+
+;FOLD PTP P11 Vel=100 % PDAT11 Tool[2]:Tool_G3 Base[1]:Base_G3 ;%{PE}
+;FOLD Parameters ;%{h}
+;Params IlfProvider=kukaroboter.basistech.inlineforms.movement.old; Kuka.IsGlobalPoint=False; Kuka.PointName=P11; Kuka.BlendingEnabled=False; Kuka.MoveDataPtpName=PDAT11; Kuka.VelocityPtp=100; Kuka.CurrentCDSetIndex=0; Kuka.MovementParameterFieldEnabled=True; IlfCommand=PTP
+;ENDFOLD
+$BWDSTART = FALSE
+PDAT_ACT = PPDAT11
+FDAT_ACT = FP11
+BAS(#PTP_PARAMS, 100.0)
+SET_CD_PARAMS (0)
+PTP XP11
+;ENDFOLD
+
+;FOLD PTP P12 Vel=50 % PDAT12 Tool[2]:Tool_G3 Base[1]:Base_G3 ;%{PE}
+;FOLD Parameters ;%{h}
+;Params IlfProvider=kukaroboter.basistech.inlineforms.movement.old; Kuka.IsGlobalPoint=False; Kuka.PointName=P12; Kuka.BlendingEnabled=False; Kuka.MoveDataPtpName=PDAT12; Kuka.VelocityPtp=50; Kuka.CurrentCDSetIndex=0; Kuka.MovementParameterFieldEnabled=True; IlfCommand=PTP
+;ENDFOLD
+$BWDSTART = FALSE
+PDAT_ACT = PPDAT12
+FDAT_ACT = FP12
+BAS(#PTP_PARAMS, 50.0)
+SET_CD_PARAMS (0)
+PTP XP12
+;ENDFOLD
+
+;FOLD PTP P14 Vel=80 % PDAT14 Tool[2]:Tool_G3 Base[1]:Base_G3 ;%{PE}
+;FOLD Parameters ;%{h}
+;Params IlfProvider=kukaroboter.basistech.inlineforms.movement.old; Kuka.IsGlobalPoint=False; Kuka.PointName=P14; Kuka.BlendingEnabled=False; Kuka.MoveDataPtpName=PDAT14; Kuka.VelocityPtp=80; Kuka.CurrentCDSetIndex=0; Kuka.MovementParameterFieldEnabled=True; IlfCommand=PTP
+;ENDFOLD
+$BWDSTART = FALSE
+PDAT_ACT = PPDAT14
+FDAT_ACT = FP14
+BAS(#PTP_PARAMS, 80.0)
+SET_CD_PARAMS (0)
+PTP XP14
+;ENDFOLD
+
+;FOLD PTP P17 Vel=80 % PDAT17 Tool[2]:Tool_G3 Base[1]:Base_G3 ;%{PE}
+;FOLD Parameters ;%{h}
+;Params IlfProvider=kukaroboter.basistech.inlineforms.movement.old; Kuka.IsGlobalPoint=False; Kuka.PointName=P17; Kuka.BlendingEnabled=False; Kuka.MoveDataPtpName=PDAT17; Kuka.VelocityPtp=80; Kuka.CurrentCDSetIndex=0; Kuka.MovementParameterFieldEnabled=True; IlfCommand=PTP
+;ENDFOLD
+$BWDSTART = FALSE
+PDAT_ACT = PPDAT17
+FDAT_ACT = FP17
+BAS(#PTP_PARAMS, 80.0)
+SET_CD_PARAMS (0)
+PTP XP17
+;ENDFOLD
+
+;FOLD PTP P18 Vel=80 % PDAT18 Tool[2]:Tool_G3 Base[1]:Base_G3 ;%{PE}
+;FOLD Parameters ;%{h}
+;Params IlfProvider=kukaroboter.basistech.inlineforms.movement.old; Kuka.IsGlobalPoint=False; Kuka.PointName=P18; Kuka.BlendingEnabled=False; Kuka.MoveDataPtpName=PDAT18; Kuka.VelocityPtp=80; Kuka.CurrentCDSetIndex=0; Kuka.MovementParameterFieldEnabled=True; IlfCommand=PTP
+;ENDFOLD
+$BWDSTART = FALSE
+PDAT_ACT = PPDAT18
+FDAT_ACT = FP18
+BAS(#PTP_PARAMS, 80.0)
+SET_CD_PARAMS (0)
+PTP XP18
+;ENDFOLD
+
+;FOLD PTP P19 Vel=80 % PDAT19 Tool[2]:Tool_G3 Base[1]:Base_G3 ;%{PE}
+;FOLD Parameters ;%{h}
+;Params IlfProvider=kukaroboter.basistech.inlineforms.movement.old; Kuka.IsGlobalPoint=False; Kuka.PointName=P19; Kuka.BlendingEnabled=False; Kuka.MoveDataPtpName=PDAT19; Kuka.VelocityPtp=80; Kuka.CurrentCDSetIndex=0; Kuka.MovementParameterFieldEnabled=True; IlfCommand=PTP
+;ENDFOLD
+$BWDSTART = FALSE
+PDAT_ACT = PPDAT19
+FDAT_ACT = FP19
+BAS(#PTP_PARAMS, 80.0)
+SET_CD_PARAMS (0)
+PTP XP19
+;ENDFOLD
+
+;FOLD PTP P20 Vel=80 % PDAT20 Tool[2]:Tool_G3 Base[1]:Base_G3 ;%{PE}
+;FOLD Parameters ;%{h}
+;Params IlfProvider=kukaroboter.basistech.inlineforms.movement.old; Kuka.IsGlobalPoint=False; Kuka.PointName=P20; Kuka.BlendingEnabled=False; Kuka.MoveDataPtpName=PDAT20; Kuka.VelocityPtp=80; Kuka.CurrentCDSetIndex=0; Kuka.MovementParameterFieldEnabled=True; IlfCommand=PTP
+;ENDFOLD
+$BWDSTART = FALSE
+PDAT_ACT = PPDAT20
+FDAT_ACT = FP20
+BAS(#PTP_PARAMS, 80.0)
+SET_CD_PARAMS (0)
+PTP XP20
+;ENDFOLD
+
+;FOLD PTP P21 Vel=80 % PDAT21 Tool[2]:Tool_G3 Base[1]:Base_G3 ;%{PE}
+;FOLD Parameters ;%{h}
+;Params IlfProvider=kukaroboter.basistech.inlineforms.movement.old; Kuka.IsGlobalPoint=False; Kuka.PointName=P21; Kuka.BlendingEnabled=False; Kuka.MoveDataPtpName=PDAT21; Kuka.VelocityPtp=80; Kuka.CurrentCDSetIndex=0; Kuka.MovementParameterFieldEnabled=True; IlfCommand=PTP
+;ENDFOLD
+$BWDSTART = FALSE
+PDAT_ACT = PPDAT21
+FDAT_ACT = FP21
+BAS(#PTP_PARAMS, 80.0)
+SET_CD_PARAMS (0)
+PTP XP21
+;ENDFOLD
+
+;FOLD PTP P22 Vel=80 % PDAT22 Tool[2]:Tool_G3 Base[1]:Base_G3 ;%{PE}
+;FOLD Parameters ;%{h}
+;Params IlfProvider=kukaroboter.basistech.inlineforms.movement.old; Kuka.IsGlobalPoint=False; Kuka.PointName=P22; Kuka.BlendingEnabled=False; Kuka.MoveDataPtpName=PDAT22; Kuka.VelocityPtp=80; Kuka.CurrentCDSetIndex=0; Kuka.MovementParameterFieldEnabled=True; IlfCommand=PTP
+;ENDFOLD
+$BWDSTART = FALSE
+PDAT_ACT = PPDAT22
+FDAT_ACT = FP22
+BAS(#PTP_PARAMS, 80.0)
+SET_CD_PARAMS (0)
+PTP XP22
+;ENDFOLD
+
+;FOLD PTP P23 Vel=80 % PDAT23 Tool[2]:Tool_G3 Base[1]:Base_G3 ;%{PE}
+;FOLD Parameters ;%{h}
+;Params IlfProvider=kukaroboter.basistech.inlineforms.movement.old; Kuka.IsGlobalPoint=False; Kuka.PointName=P23; Kuka.BlendingEnabled=False; Kuka.MoveDataPtpName=PDAT23; Kuka.VelocityPtp=80; Kuka.CurrentCDSetIndex=0; Kuka.MovementParameterFieldEnabled=True; IlfCommand=PTP
+;ENDFOLD
+$BWDSTART = FALSE
+PDAT_ACT = PPDAT23
+FDAT_ACT = FP23
+BAS(#PTP_PARAMS, 80.0)
+SET_CD_PARAMS (0)
+PTP XP23
+;ENDFOLD
+
+;===================================================================
+;========== Movimento Ponto de Recolha 1 -> Balde Verde ============
+;===================================================================
+
+;FOLD PTP P25 Vel=80 % PDAT25 Tool[2]:Tool_G3 Base[1]:Base_G3 ;%{PE}
+;FOLD Parameters ;%{h}
+;Params IlfProvider=kukaroboter.basistech.inlineforms.movement.old; Kuka.IsGlobalPoint=False; Kuka.PointName=P25; Kuka.BlendingEnabled=False; Kuka.MoveDataPtpName=PDAT25; Kuka.VelocityPtp=80; Kuka.CurrentCDSetIndex=0; Kuka.MovementParameterFieldEnabled=True; IlfCommand=PTP
+;ENDFOLD
+$BWDSTART = FALSE
+PDAT_ACT = PPDAT25
+FDAT_ACT = FP25
+BAS(#PTP_PARAMS, 80.0)
+SET_CD_PARAMS (0)
+PTP XP25
+;ENDFOLD
+
+
+;=================================================================
+;========= Movimento Ponto de Recolha 1 -> Balde Azul ============
+;=================================================================
+
+;FOLD PTP P26 Vel=80 % PDAT26 Tool[2]:Tool_G3 Base[1]:Base_G3 ;%{PE}
+;FOLD Parameters ;%{h}
+;Params IlfProvider=kukaroboter.basistech.inlineforms.movement.old; Kuka.IsGlobalPoint=False; Kuka.PointName=P26; Kuka.BlendingEnabled=False; Kuka.MoveDataPtpName=PDAT26; Kuka.VelocityPtp=80; Kuka.CurrentCDSetIndex=0; Kuka.MovementParameterFieldEnabled=True; IlfCommand=PTP
+;ENDFOLD
+$BWDSTART = FALSE
+PDAT_ACT = PPDAT26
+FDAT_ACT = FP26
+BAS(#PTP_PARAMS, 80.0)
+SET_CD_PARAMS (0)
+PTP XP26
+;ENDFOLD
+
+
+;=======================================================================
+;============ Movimento Ponto de Recolha 2 -> Balde Amarelo ============
+;=======================================================================
+
+;FOLD PTP P27 Vel=80 % PDAT27 Tool[2]:Tool_G3 Base[1]:Base_G3 ;%{PE}
+;FOLD Parameters ;%{h}
+;Params IlfProvider=kukaroboter.basistech.inlineforms.movement.old; Kuka.IsGlobalPoint=False; Kuka.PointName=P27; Kuka.BlendingEnabled=False; Kuka.MoveDataPtpName=PDAT27; Kuka.VelocityPtp=80; Kuka.CurrentCDSetIndex=0; Kuka.MovementParameterFieldEnabled=True; IlfCommand=PTP
+;ENDFOLD
+$BWDSTART = FALSE
+PDAT_ACT = PPDAT27
+FDAT_ACT = FP27
+BAS(#PTP_PARAMS, 80.0)
+SET_CD_PARAMS (0)
+PTP XP27
+;ENDFOLD
+
+
+;===================================================================
+;========== Movimento Ponto de Recolha 2 -> Balde Verde ============
+;===================================================================
+
+;FOLD PTP P28 Vel=80 % PDAT28 Tool[2]:Tool_G3 Base[1]:Base_G3 ;%{PE}
+;FOLD Parameters ;%{h}
+;Params IlfProvider=kukaroboter.basistech.inlineforms.movement.old; Kuka.IsGlobalPoint=False; Kuka.PointName=P28; Kuka.BlendingEnabled=False; Kuka.MoveDataPtpName=PDAT28; Kuka.VelocityPtp=80; Kuka.CurrentCDSetIndex=0; Kuka.MovementParameterFieldEnabled=True; IlfCommand=PTP
+;ENDFOLD
+$BWDSTART = FALSE
+PDAT_ACT = PPDAT28
+FDAT_ACT = FP28
+BAS(#PTP_PARAMS, 80.0)
+SET_CD_PARAMS (0)
+PTP XP28
+;ENDFOLD
+
+
+;=================================================================
+;========= Movimento Ponto de Recolha 2 -> Balde Azul ============
+;=================================================================
+
+;FOLD PTP P29 Vel=80 % PDAT29 Tool[2]:Tool_G3 Base[1]:Base_G3 ;%{PE}
+;FOLD Parameters ;%{h}
+;Params IlfProvider=kukaroboter.basistech.inlineforms.movement.old; Kuka.IsGlobalPoint=False; Kuka.PointName=P29; Kuka.BlendingEnabled=False; Kuka.MoveDataPtpName=PDAT29; Kuka.VelocityPtp=80; Kuka.CurrentCDSetIndex=0; Kuka.MovementParameterFieldEnabled=True; IlfCommand=PTP
+;ENDFOLD
+$BWDSTART = FALSE
+PDAT_ACT = PPDAT29
+FDAT_ACT = FP29
+BAS(#PTP_PARAMS, 80.0)
+SET_CD_PARAMS (0)
+PTP XP29
+;ENDFOLD
+
+
+;=======================================================================
+;============ Movimento Ponto de Recolha 3 -> Balde Amarelo ============
+;=======================================================================
+
+;FOLD PTP P30 Vel=80 % PDAT30 Tool[2]:Tool_G3 Base[1]:Base_G3 ;%{PE}
+;FOLD Parameters ;%{h}
+;Params IlfProvider=kukaroboter.basistech.inlineforms.movement.old; Kuka.IsGlobalPoint=False; Kuka.PointName=P30; Kuka.BlendingEnabled=False; Kuka.MoveDataPtpName=PDAT30; Kuka.VelocityPtp=80; Kuka.CurrentCDSetIndex=0; Kuka.MovementParameterFieldEnabled=True; IlfCommand=PTP
+;ENDFOLD
+$BWDSTART = FALSE
+PDAT_ACT = PPDAT30
+FDAT_ACT = FP30
+BAS(#PTP_PARAMS, 80.0)
+SET_CD_PARAMS (0)
+PTP XP30
+;ENDFOLD
+
+
+;===================================================================
+;========== Movimento Ponto de Recolha 3 -> Balde Verde ============
+;===================================================================
+
+;FOLD PTP P31 Vel=80 % PDAT31 Tool[2]:Tool_G3 Base[1]:Base_G3 ;%{PE}
+;FOLD Parameters ;%{h}
+;Params IlfProvider=kukaroboter.basistech.inlineforms.movement.old; Kuka.IsGlobalPoint=False; Kuka.PointName=P31; Kuka.BlendingEnabled=False; Kuka.MoveDataPtpName=PDAT31; Kuka.VelocityPtp=80; Kuka.CurrentCDSetIndex=0; Kuka.MovementParameterFieldEnabled=True; IlfCommand=PTP
+;ENDFOLD
+$BWDSTART = FALSE
+PDAT_ACT = PPDAT31
+FDAT_ACT = FP31
+BAS(#PTP_PARAMS, 80.0)
+SET_CD_PARAMS (0)
+PTP XP31
+;ENDFOLD
+
+
+;=================================================================
+;========= Movimento Ponto de Recolha 3 -> Balde Azul ============
+;=================================================================
+
+;FOLD PTP P32 Vel=80 % PDAT32 Tool[2]:Tool_G3 Base[1]:Base_G3 ;%{PE}
+;FOLD Parameters ;%{h}
+;Params IlfProvider=kukaroboter.basistech.inlineforms.movement.old; Kuka.IsGlobalPoint=False; Kuka.PointName=P32; Kuka.BlendingEnabled=False; Kuka.MoveDataPtpName=PDAT32; Kuka.VelocityPtp=80; Kuka.CurrentCDSetIndex=0; Kuka.MovementParameterFieldEnabled=True; IlfCommand=PTP
+;ENDFOLD
+$BWDSTART = FALSE
+PDAT_ACT = PPDAT32
+FDAT_ACT = FP32
+BAS(#PTP_PARAMS, 80.0)
+SET_CD_PARAMS (0)
+PTP XP32
+;ENDFOLD
+
+
+END

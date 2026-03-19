@@ -1,0 +1,169 @@
+﻿&ACCESS RVP
+DEF  Points ( )
+   GLOBAL INTERRUPT DECL 3 WHEN $STOPMESS==TRUE DO IR_STOPM ( )
+   INTERRUPT ON 3 
+   
+   GLOBAL INTERRUPT DECL 4 WHEN B_VERMELHO==TRUE DO Parar_Robo()
+   INTERRUPT ON 4
+   
+   BAS (#INITMOV, 0)
+   BAS (#TOOL, XTOOL)
+   BAS (#BASE, XTOOLBASE)
+   
+   Inicializacao()
+
+   LOOP
+      WAIT SEC 0.1  ; Anti repique
+      
+      ; Robô pronto (standby)
+      SinalAmarelo ()
+      
+      IF B_Branco THEN
+         leitura_visao()
+         WAIT FOR NOT B_Branco
+      ENDIF 
+   ENDLOOP
+END
+
+DEF Inicializacao ()
+   ; Atribuir os pontos ao array
+   PontoRecolhaArray[1] = P1_Recolha
+   PontoRecolhaArray[2] = P2_Recolha
+   PontoRecolhaArray[3] = P3_Recolha
+   
+   ; Atribuir os pontos ao array
+   PontoDepositoArray[1] = P1_Deposito
+   PontoDepositoArray[2] = P2_Deposito
+   PontoDepositoArray[3] = P3_Deposito
+   
+   ; Atribuir os pontos ao array
+   PontoIntermedioArray[1] = P1_Intermedia
+   PontoIntermedioArray[2] = P2_Intermedia
+   PontoIntermedioArray[3] = P3_Intermedia
+   PontoIntermedioArray[4] = P4_Intermedia
+   PontoIntermedioArray[5] = P5_Intermedia
+   PontoIntermedioArray[6] = P6_Intermedia
+   
+   count[1] = 0
+   count[2] = 0
+   count[3] = 0
+END
+
+DEF SinalVerde()
+  AZUL = FALSE  ; Luz amarela OFF
+  VERDE = TRUE   ; Luz verde ON
+  LARANJA = FALSE  ; Luz vermelha OFF
+END
+
+DEF SinalAmarelo()
+  AZUL = TRUE   ; Luz amarela ON
+  VERDE = FALSE  ; Luz verde OFF
+  LARANJA = FALSE  ; Luz vermelha OFF
+END
+
+DEF SinalErro()
+  AZUL = FALSE  ; Luz amarela OFF
+  VERDE = FALSE  ; Luz verde OFF
+  LARANJA = TRUE   ; Luz vermelha ON
+END 
+
+DEF leitura_visao ()
+   DECL INT i, j
+
+   ; Mapear sinais de visão para índices
+   DECL BOOL visao[9]
+   
+   visao[1] = TRUE
+   visao[2] = IN_POS1_AZUL
+   visao[3] = IN_POS1_VERDE
+   visao[4] = IN_POS2_AMARELO
+   visao[5] = IN_POS2_AZUL
+   visao[6] = IN_POS2_VERDE
+   visao[7] = IN_POS3_AMARELO
+   visao[8] = IN_POS3_AZUL
+   visao[9] = IN_POS3_VERDE
+   
+   SinalVerde ()
+   
+   FOR i = 1 TO 3
+      IF count[i] < 3 THEN
+         FOR j = 1 TO 3
+            IF visao[1 + (i-1) + ((j-1)*3)] THEN
+               Recolher(PontoRecolhaArray[j], PontoIntermedioArray[j])
+               Deposito(PontoDepositoArray[i], PontoIntermedioArray[i + 3], count[i])
+               count[i] = count[i] + 1
+            ENDIF
+         ENDFOR
+      ELSE
+         SinalErro()      
+      ENDIF
+   ENDFOR
+END
+
+
+DEF Recolher(PontoBase:IN, PontoIntermedio:IN)
+   DECL POS PontoBase, PontoIntermedio, PontoBaixo, PontoRotacionado
+   DECL INT Z_Variation, ROTATION
+
+   ; Começar em Home
+   SPTP HOME WITH $VEL_AXIS[1] = SVEL_JOINT(PDAT1.VEL), $ACC_AXIS[1] = SACC_JOINT(PDAT1), $APO.CDIS = PDAT1.APO_DIST
+
+   ; --- Parâmetros ajustáveis (podes também passar por argumento ou definir globais) ---
+   Z_Variation = 120      ; altura para baixar (negativo = descer)
+   ROTATION    = 60       ; graus a rodar no eixo C
+
+   ; --- Ir ao ponto base (posição inicial acima do objeto) ---
+   SPTP PontoBase WITH $VEL_AXIS[1] = SVEL_JOINT(PDAT2.VEL), $ACC_AXIS[1] = SACC_JOINT(PDAT2), $APO.CDIS = PDAT2.APO_DIST
+
+   ; --- Baixar até à altura do objeto ---
+   PontoBaixo = PontoBase
+   PontoBaixo.Z = PontoBase.Z + Z_Variation
+   SPTP PontoBaixo WITH $VEL_AXIS[1] = SVEL_JOINT(PDAT3.VEL), $ACC_AXIS[1] = SACC_JOINT(PDAT3), $APO.CDIS = PDAT3.APO_DIST
+
+   ; --- Rodar no local (C = eixo de rotação em torno do TCP) ---
+   PontoRotacionado = PontoBaixo
+   PontoRotacionado.C = PontoBaixo.C + ROTATION
+   SPTP PontoRotacionado WITH $VEL_AXIS[1] = SVEL_JOINT(PDAT4.VEL), $ACC_AXIS[1] = SACC_JOINT(PDAT4), $APO.CDIS = PDAT4.APO_DIST
+
+   ; --- Subida Intermédia ---
+   SPTP PontoIntermedio WITH $VEL_AXIS[1] = SVEL_JOINT(PDAT5.VEL), $ACC_AXIS[1] = SACC_JOINT(PDAT5), $APO.CDIS = PDAT5.APO_DIST
+
+   ; Começar em Home
+   SPTP HOME WITH $VEL_AXIS[1] = SVEL_JOINT(PDAT1.VEL), $ACC_AXIS[1] = SACC_JOINT(PDAT1), $APO.CDIS = PDAT1.APO_DIST
+END
+
+
+DEF Deposito(PontoDeposito:IN, PontoIntermedio:IN, count:IN)
+   DECL POS PontoDeposito, PontoIntermedio, PontoBaixo, PontoRotacionado
+   DECL INT Z_Variation, ROTATION, count
+   
+   ; --- Parâmetros ajustáveis (podes também passar por argumento ou definir globais) ---
+   Z_Variation = 120      ; altura para baixar (negativo = descer)
+   ROTATION    = 60       ; graus a rodar no eixo C
+   
+   ; --- Ir ao Ponto Deposito (posição inicial acima do lixo) ---
+   SPTP PontoDeposito WITH $VEL_AXIS[1] = SVEL_JOINT(PDAT6.VEL), $ACC_AXIS[1] = SACC_JOINT(PDAT6), $APO.CDIS = PDAT6.APO_DIST
+
+   ; --- Baixar até à altura do objeto ---
+   PontoBaixo = PontoDeposito
+   PontoBaixo.Z = PontoDeposito.Z + Z_Variation - (count * 25)
+   SPTP PontoBaixo WITH $VEL_AXIS[1] = SVEL_JOINT(PDAT7.VEL), $ACC_AXIS[1] = SACC_JOINT(PDAT7), $APO.CDIS = PDAT7.APO_DIST
+
+   ; --- Rodar no local (C = eixo de rotação em torno do TCP) ---
+   PontoRotacionado = PontoBaixo
+   PontoRotacionado.C = PontoBaixo.C + ROTATION
+   SPTP PontoRotacionado WITH $VEL_AXIS[1] = SVEL_JOINT(PDAT8.VEL), $ACC_AXIS[1] = SACC_JOINT(PDAT8), $APO.CDIS = PDAT8.APO_DIST
+
+   ; --- Subida Intermédia ---
+   SPTP PontoIntermedio WITH $VEL_AXIS[1] = SVEL_JOINT(PDAT9.VEL), $ACC_AXIS[1] = SACC_JOINT(PDAT9), $APO.CDIS = PDAT9.APO_DIST
+
+   ; Começar em Home
+   SPTP HOME WITH $VEL_AXIS[1] = SVEL_JOINT(PDAT10.VEL), $ACC_AXIS[1] = SACC_JOINT(PDAT10), $APO.CDIS = PDAT10.APO_DIST
+END
+
+DEF Parar_Robo()
+   SinalAmarelo()
+   WHILE B_VERMELHO
+      WAIT SEC 0.1
+   ENDWHILE
+END

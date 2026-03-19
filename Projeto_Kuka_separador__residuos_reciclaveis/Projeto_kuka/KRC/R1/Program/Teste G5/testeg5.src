@@ -1,0 +1,126 @@
+&ACCESS RVP
+DEF testeG5 ( )
+   GLOBAL INTERRUPT DECL 3 WHEN $STOPMESS==TRUE DO IR_STOPM ( )
+   INTERRUPT ON 3
+   ; Desativa todas as workspaces
+  
+
+
+   
+   BAS (#INITMOV,0 )
+   BAS (#TOOL, XTOOL)
+   BAS (#BASE, XTOOLBASE)
+
+   ; Move para casa
+   SPTP XHOME
+   entregaCirculo()
+   
+   ;LOOP 
+    ; $OUT[11] = TRUE
+    ; capturarSequencia()
+    ;   $OUT[11] = FALSE
+    ; executarSequenciaEntrega()
+    ; SPTP XHOME
+   ;ENDLOOP
+END
+
+
+DEF entregaQuadrado ( )
+    
+LIN recolha1
+LIN recolha2
+LIN recolha3
+LIN recolha4
+
+LIN Quadrado1
+LIN Quadrado2
+LIN Quadrado3
+LIN Quadrado4
+   
+END
+
+
+DEF entregaHexagono ( )
+    
+LIN recolha1
+LIN recolha2
+LIN recolha3
+LIN recolha4
+
+LIN Hexagono1
+LIN Hexagono2
+LIN Hexagono3
+LIN Hexagono4
+
+END
+
+DEF entregaCirculo ( )
+    
+LIN recolha1
+LIN recolha2
+LIN recolha3
+LIN recolha4
+
+LIN Circulo1
+LIN Circulo2
+LIN Circulo3
+LIN Circulo4
+
+END
+
+
+
+
+DEF capturarSequencia( )
+   DECL INT count
+   count = 1
+
+   WHILE count <= 3
+      IF $IN[19] THEN
+         sequencia[count] = 1 ; Círculo
+         count = count + 1
+         WAIT FOR NOT $IN[19]
+      ELSE
+         IF $IN[20] THEN
+            sequencia[count] = 2 ; Hexágono
+            count = count + 1
+            WAIT FOR NOT $IN[20]
+         ELSE
+            IF $IN[21] THEN
+               sequencia[count] = 3 ; Quadrado
+               count = count + 1
+               WAIT FOR NOT $IN[21]
+            ENDIF
+         ENDIF
+      ENDIF
+   ENDWHILE
+END
+
+
+DEF executarSequenciaEntrega( )
+   DECL INT i
+   DECL REAL hRecolha, hEntrega
+
+   hRecolha = -79.29
+   hEntrega = -19.29
+
+   FOR i = 1 TO 3
+
+      SWITCH sequencia[i]
+         CASE 1 ; Círculo
+            Circulo2.Z = hEntrega
+            Circulo3.Z = hEntrega
+            entregaCirculo()
+         CASE 2 ; Hexágono
+            Hexagono2.Z = hEntrega
+            Hexagono3.Z = hEntrega
+            entregaHexagono()
+         CASE 3 ; Quadrado
+            Quadrado2.Z = hEntrega
+            Quadrado3.Z = hEntrega
+            entregaQuadrado()
+      ENDSWITCH
+       hRecolha = hRecolha + 30.0
+       hEntrega = hEntrega - 30.0
+   ENDFOR
+END

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<xs:element name="Version">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="Info"/>
+				<xs:element ref="Schema"/>
+			</xs:sequence>
+			<xs:attribute name="Label" use="required">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value=""/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Schema">
+		<xs:complexType>
+			<xs:attribute name="Version" use="required" type="xs:string"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Info">
+		<xs:complexType>
+			<xs:attribute name="Version" use="required" type="xs:string"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ConnectionChain">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="Version"/>
+				<xs:element ref="Connection" maxOccurs="unbounded" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Connection">
+		<xs:complexType>
+			<xs:attribute name="name" use="required" type="xs:string"/>
+			<xs:attribute name="chain" use="required" type="xs:string"/>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

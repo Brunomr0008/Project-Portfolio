@@ -1,0 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Connections>
+  <Connection Type="KukaRoboter.WorkOnline.Connections.KrcConnectionTarget" ConnectionString="PCRC-QTWV1RUPCQ;PCRC-QTWV1RUPCQ;192.168.10.252;8159247;V8.7.6.600;KR C;Options:DiagnosisSafety,3.2.3.79|DiagnosisServiceEtherCAT,1.0.4.160|EthernetKRL,3.2.4.1042|KUKA.BoardPackage,3.6.3.4|KUKA.DeviceConnector pre-installed,2.1.10.288|KUKA.PROFINET S,6.0.6.39|KUKA.SoftwarePackage smartPAD-2,1.1.2.1|KUKA.UpdatePackageFirmware,1.2.1.48|KUKA.UpdateService,1.1.20.673|KUKA.UpdateServiceConfiguration,1.0.13.229" LastActive="true" />
+</Connections>
