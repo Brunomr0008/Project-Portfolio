@@ -1,0 +1,19 @@
+{
+  "version": 2,
+  "dgSpecHash": "zFwcd8kugjg=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\bruno\\Desktop\\Project-Portfolio\\Projeto_Kuka_separador_residuos_reciclaveis\\ComputerVision\\ComputerVision\\ComputerVision.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\bruno\\.nuget\\packages\\libplctag\\1.5.2\\libplctag.1.5.2.nupkg.sha512",
+    "C:\\Users\\bruno\\.nuget\\packages\\libplctag.nativeimport\\1.0.41\\libplctag.nativeimport.1.0.41.nupkg.sha512",
+    "C:\\Users\\bruno\\.nuget\\packages\\opencvsharp4\\4.11.0.20250507\\opencvsharp4.4.11.0.20250507.nupkg.sha512",
+    "C:\\Users\\bruno\\.nuget\\packages\\opencvsharp4.extensions\\4.11.0.20250507\\opencvsharp4.extensions.4.11.0.20250507.nupkg.sha512",
+    "C:\\Users\\bruno\\.nuget\\packages\\opencvsharp4.runtime.win\\4.11.0.20250507\\opencvsharp4.runtime.win.4.11.0.20250507.nupkg.sha512",
+    "C:\\Users\\bruno\\.nuget\\packages\\system.buffers\\4.6.1\\system.buffers.4.6.1.nupkg.sha512",
+    "C:\\Users\\bruno\\.nuget\\packages\\system.drawing.common\\8.0.11\\system.drawing.common.8.0.11.nupkg.sha512",
+    "C:\\Users\\bruno\\.nuget\\packages\\system.memory\\4.6.3\\system.memory.4.6.3.nupkg.sha512",
+    "C:\\Users\\bruno\\.nuget\\packages\\system.numerics.vectors\\4.6.1\\system.numerics.vectors.4.6.1.nupkg.sha512",
+    "C:\\Users\\bruno\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\6.1.2\\system.runtime.compilerservices.unsafe.6.1.2.nupkg.sha512"
+  ],
+  "logs": []
+}
