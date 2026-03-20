@@ -1,12 +1,13 @@
 # 🤖 Robô Separador de Resíduos Recicláveis
 
-> Projeto de Robótica Avançada — Mestrado em Engenharia Eletrotécnica e de Computadores  
-> Instituto Politécnico do Cávado e do Ave · Escola Superior de Tecnologia
-
 ![Robot](https://img.shields.io/badge/Robô-KUKA%20SCARA-blue?style=flat-square)
-![Vision](https://img.shields.io/badge/Visão-Computacional-green?style=flat-square)
+![Vision Computacional](https://img.shields.io/badge/Visão%20Computacional-Visual%20Studio-purple?style=flat-square)
 ![PLC](https://img.shields.io/badge/PLC-Sysmac-orange?style=flat-square)
 ![Status](https://img.shields.io/badge/Status-Concluído-brightgreen?style=flat-square)
+
+<p align="center">
+  <img src="docs/images/capa.png" alt="Robô KUKA SCARA com caixas de depósito Verde, Amarelo e Azul" width="560"/>
+</p>
 
 ---
 
@@ -54,32 +55,53 @@ Sistema automatizado de separação de resíduos recicláveis que combina um **b
 
 ## 🔄 Fluxo de Operação
 
-```
-Início
-  │
-  ▼
-Inicializar Arrays e Contadores
-  │
-  ▼
-Mover para XHOME (posição de segurança)
-  │
-  ▼
-Aguardar botão START (B_Branco) ──── NÃO ──▶ 🟡 Luz Amarela (espera)
-  │
- SIM
-  │
-  ▼
-Ler sinais de visão (leitura_visao)
-  │
-  ├──▶ Depósito Verde cheio? ──▶ 🔴 Luz Vermelha (erro)
-  ├──▶ Depósito Amarelo cheio? ─▶ 🔴 Luz Vermelha (erro)
-  └──▶ Depósito Azul cheio? ───▶ 🔴 Luz Vermelha (erro)
-  │
-  ▼ (depósito disponível)
-🟢 Luz Verde → Recolher Peça → Depositar Peça
-  │
-  └──▶ Voltar ao início do loop
-```
+<p align="center">
+  <img src="docs/images/fluxograma.png" alt="Fluxograma do sistema" width="420"/>
+</p>
+
+---
+
+## 🎮 Interface de Controlo
+
+O sistema inclui um painel físico com três botões e uma coluna de luzes de sinalização:
+
+<p align="center">
+  <img src="docs/images/botoes.png" alt="Botões Start, Stop e Reset" width="220"/>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="docs/images/luzes.png" alt="Luzes de Sinalização" width="220"/>
+</p>
+
+| Botão | Função |
+|---|---|
+| ⬆️ Branco (B_Branco) | Start / Reativar ciclo |
+| 🔴 Vermelho (B_VERMELHO) | Paragem de emergência |
+| ⬇️ Preto (B_PRETO) | Reset geral |
+
+| Luz | Significado |
+|---|---|
+| 🟢 Verde | Operação normal — peça em processamento |
+| 🟡 Amarelo | Modo de espera |
+| 🔴 Vermelho | Erro — depósito cheio |
+
+---
+
+## 👁️ Aplicação de Visão por Computador
+
+A aplicação captura imagens em tempo real, classifica os resíduos por cor e envia os resultados como sinais digitais booleanos para o PLC Sysmac, que por sua vez comanda o robô.
+
+**Botões do painel:**
+- `btnStartCamera` — Inicia a captura de vídeo
+- `btnStopCamera` — Para a captura de vídeo
+- `btnCapture` — Captura imagem, deteta cor/posição e envia para o PLC
+- `btnResetDetections` — Limpa os resultados de deteção
+
+<p align="center">
+  <img src="docs/images/painel_visao.png" alt="Painel de Visão por Computador" width="700"/>
+</p>
+
+<p align="center">
+  <img src="docs/images/sysmac.png" alt="Configuração Sysmac" width="700"/>
+</p>
 
 ---
 
@@ -134,18 +156,6 @@ robotic()                  ← Ciclo principal
 ├── Parar_Robo()           ← Interrupção de paragem (B_VERMELHO)
 └── Reset_Robo()           ← Interrupção de reset (B_PRETO)
 ```
-
----
-
-## 📸 Aplicação de Visão por Computador
-
-A aplicação captura imagens em tempo real e classifica os resíduos por cor, enviando os resultados como **sinais digitais booleanos** para o PLC Sysmac.
-
-**Botões do painel:**
-- `btnStartCamera` — Inicia a captura de vídeo
-- `btnStopCamera` — Para a captura de vídeo
-- `btnCapture` — Captura imagem, deteta cor/posição e envia para o PLC
-- `btnResetDetections` — Limpa os resultados de deteção
 
 ---
 
