@@ -6,7 +6,7 @@
 ![Status](https://img.shields.io/badge/Status-Concluído-brightgreen?style=flat-square)
 
 <p align="center">
-  <img src="docs/images/capa.png" alt="Robô KUKA SCARA com caixas de depósito Verde, Amarelo e Azul" width="560"/>
+  <img src="docs/images/capa.png" alt="Robô KUKA SCARA com caixas de depósito Verde, Amarelo e Azul" width="300"/>
 </p>
 
 ---
@@ -30,33 +30,38 @@ Sistema automatizado de separação de resíduos recicláveis que combina um **b
 
 ## 🏗️ Arquitetura do Sistema
 
-```
-┌─────────────────┐     ┌──────────────┐     ┌─────────────────┐
-│   Câmara /      │────▶│  PLC Sysmac  │────▶│   Robô KUKA     │
-│  Visão Computac.│     │  (Sysmac)    │     │   SCARA         │
-└─────────────────┘     └──────────────┘     └─────────────────┘
-         │                      │                      │
-   Deteta cor            Envia sinais           Recolhe e deposita
-   da peça               digitais I/O           a peça no local certo
-```
+<div align="center">
+  <pre>
+┌─────────────────┐       ┌──────────────┐      ┌─────────────────┐
+│   Câmara /      │────▶ │  PLC Sysmac  │────▶ │   Robô KUKA     │
+│  Visão Computac.│       │  (Sysmac)    │      │   SCARA         │
+└─────────────────┘       └──────────────┘      └─────────────────┘
+│                      │                      │
+      Deteta cor            Envia sinais         Recolhe e deposita
+         da peça             digitais I/O        a peça no local certo
+  </pre>
+</div>
 
 ### Componentes principais
 
-| Componente | Descrição |
-|---|---|
-| **Robô KUKA SCARA** | Braço robótico com garra (gripper) |
-| **Base_G3** | Sistema de coordenadas de referência da célula de trabalho |
-| **Tool_G3** | Definição do ponto exato de atuação da garra |
-| **SPTP** | Movimento suave ponto-a-ponto para deslocamentos rápidos |
-| **PLC Sysmac** | Controlador lógico que recebe dados da visão e comanda o robô |
-| **Aplicação de Visão** | Interface .NET com captura e classificação por cor |
+<div align="center">
+  
+  | Componente | Descrição |
+  |---|---|
+  | **Robô KUKA SCARA** | Braço robótico com garra (gripper) |
+  | **Base_G3** | Sistema de coordenadas de referência da célula de trabalho |
+  | **Tool_G3** | Definição do ponto exato de atuação da garra |
+  | **SPTP** | Movimento suave ponto-a-ponto para deslocamentos rápidos |
+  | **PLC Sysmac** | Controlador lógico que recebe dados da visão e comanda o robô |
+  | **Aplicação de Visão** | Interface .NET com captura e classificação por cor |
+</div>
 
 ---
 
 ## 🔄 Fluxo de Operação
 
 <p align="center">
-  <img src="docs/images/fluxograma.png" alt="Fluxograma do sistema" width="420"/>
+  <img src="docs/images/fluxograma.png" alt="Fluxograma do sistema" width="300"/>
 </p>
 
 ---
@@ -66,22 +71,25 @@ Sistema automatizado de separação de resíduos recicláveis que combina um **b
 O sistema inclui um painel físico com três botões e uma coluna de luzes de sinalização:
 
 <p align="center">
-  <img src="docs/images/botoes.png" alt="Botões Start, Stop e Reset" width="220"/>
+  <img src="docs/images/botoes.png" alt="Botões Start, Stop e Reset" width="150"/>
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="docs/images/luzes.png" alt="Luzes de Sinalização" width="220"/>
+  <img src="docs/images/luzes.png" alt="Luzes de Sinalização" width="100"/>
 </p>
 
-| Botão | Função |
-|---|---|
-| ⬆️ Branco (B_Branco) | Start / Reativar ciclo |
-| 🔴 Vermelho (B_VERMELHO) | Paragem de emergência |
-| ⬇️ Preto (B_PRETO) | Reset geral |
+<div align="center">
+  
+  | Botão | Função |
+  |---|---|
+  | ⬆️ Branco (B_Branco) | Start / Reativar ciclo |
+  | 🔴 Vermelho (B_VERMELHO) | Paragem de emergência |
+  | ⬇️ Preto (B_PRETO) | Reset geral |
 
-| Luz | Significado |
-|---|---|
-| 🟢 Verde | Operação normal — peça em processamento |
-| 🟡 Amarelo | Modo de espera |
-| 🔴 Vermelho | Erro — depósito cheio |
+  | Luz | Significado |
+  |---|---|
+  | 🟢 Verde | Operação normal — peça em processamento |
+  | 🟡 Amarelo | Modo de espera |
+  | 🔴 Vermelho | Erro — depósito cheio |
+</div>
 
 ---
 
@@ -108,40 +116,48 @@ A aplicação captura imagens em tempo real, classifica os resíduos por cor e e
 ## 📍 Pontos Definidos
 
 ### Pontos de Recolha
-| Ponto | X | Y | Z | C |
-|---|---|---|---|---|
-| P1_Recolha | 65.5 | 224.0 | -140 | 26 |
-| P2_Recolha | 64.5 | 152.5 | -140 | 26 |
-| P3_Recolha | 63.5 | 82.0 | -140 | 26 |
+<div align="center">
+
+  | Ponto | X | Y | Z | C |
+  |---|---|---|---|---|
+  | P1_Recolha | 65.5 | 224.0 | -140 | 26 |
+  | P2_Recolha | 64.5 | 152.5 | -140 | 26 |
+  | P3_Recolha | 63.5 | 82.0 | -140 | 26 |
+</div>
 
 ### Pontos de Depósito
-| Ponto | Cor | X | Y | Z | C |
-|---|---|---|---|---|---|
-| P1_Deposito | 🟢 Verde | 696.5 | 228.3 | -140 | 3.5 |
-| P2_Deposito | 🟡 Amarelo | 695.5 | 141.5 | -140 | 3.5 |
-| P3_Deposito | 🔵 Azul | 695.5 | 55.0 | -140 | 3.5 |
+<div align="center">
+
+  | Ponto | Cor | X | Y | Z | C |
+  |---|---|---|---|---|---|
+  | P1_Deposito | 🟢 Verde | 696.5 | 228.3 | -140 | 3.5 |
+  | P2_Deposito | 🟡 Amarelo | 695.5 | 141.5 | -140 | 3.5 |
+  | P3_Deposito | 🔵 Azul | 695.5 | 55.0 | -140 | 3.5 |
+</div>
 
 ---
 
 ## 🔌 Mapeamento de I/O (KUKA ↔ Sysmac)
+<div align="center">
 
-| Endereço KUKA | Sinal Sysmac | Função |
-|---|---|---|
-| IN11 | Output 00 | IN_POS1_VERDE |
-| IN12 | Output 01 | IN_POS1_AMARELO |
-| IN13 | Output 02 | IN_POS1_AZUL |
-| IN14 | Output 03 | IN_POS2_AZUL |
-| IN15 | Output 04 | IN_POS2_AMARELO |
-| IN16 | Output 05 | IN_POS2_AZUL |
-| IN17 | Output 06 | IN_POS3_VERDE |
-| IN18 | Output 07 | IN_POS3_AMARELO |
-| IN19 | Output 08 | IN_POS3_AZUL |
-| IN20 | Botão Branco | B_Branco (Start) |
-| IN21 | Botão Vermelho | B_VERMELHO (Stop) |
-| IN22 | Botão Preto | B_PRETO (Reset) |
-| OUT21 | — | Luz Azul |
-| OUT22 | — | Luz Verde |
-| OUT23 | — | Luz Laranja |
+  | Endereço KUKA | Sinal Sysmac | Função |
+  |---|---|---|
+  | IN11 | Output 00 | IN_POS1_VERDE |
+  | IN12 | Output 01 | IN_POS1_AMARELO |
+  | IN13 | Output 02 | IN_POS1_AZUL |
+  | IN14 | Output 03 | IN_POS2_AZUL |
+  | IN15 | Output 04 | IN_POS2_AMARELO |
+  | IN16 | Output 05 | IN_POS2_AZUL |
+  | IN17 | Output 06 | IN_POS3_VERDE |
+  | IN18 | Output 07 | IN_POS3_AMARELO |
+  | IN19 | Output 08 | IN_POS3_AZUL |
+  | IN20 | Botão Branco | B_Branco (Start) |
+  | IN21 | Botão Vermelho | B_VERMELHO (Stop) |
+  | IN22 | Botão Preto | B_PRETO (Reset) |
+  | OUT21 | — | Luz Azul |
+  | OUT22 | — | Luz Verde |
+  | OUT23 | — | Luz Laranja |
+</div>
 
 ---
 
