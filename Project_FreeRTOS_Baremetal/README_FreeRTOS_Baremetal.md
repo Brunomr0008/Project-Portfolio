@@ -1,9 +1,6 @@
 # 🔧 STM32 Embedded System — Bare Metal vs FreeRTOS
 
-> Sistemas Embebidos em Tempo Real — STM32H7  
-> MEEC (Mestrado em Engenharia Eletrotécnica e de Computadores)
-
-![STM32](https://img.shields.io/badge/MCU-STM32H7-blue?style=flat-square)
+![STM32](https://img.shields.io/badge/MCU-STM32H743ZI2-blue?style=flat-square)
 ![FreeRTOS](https://img.shields.io/badge/OS-FreeRTOS-green?style=flat-square)
 ![HAL](https://img.shields.io/badge/Framework-STM32HAL-orange?style=flat-square)
 ![Status](https://img.shields.io/badge/Status-Concluído-brightgreen?style=flat-square)
@@ -20,11 +17,11 @@ Este projeto implementa o **mesmo sistema embebido** de duas formas diferentes, 
 
 ### FreeRTOS
 
-https://github.com/user/repo/raw/main/docs/videos/FreeRTOS.mp4
+https://github.com/user-attachments/assets/070cfb22-4d01-41fa-b131-11f85a0fd2fa
 
 ### Bare Metal
 
-https://github.com/user/repo/raw/main/docs/videos/baremetal.mp4
+https://github.com/user-attachments/assets/749e743d-47bb-47dc-a689-9ba3a509a7c8
 
 > **Nota:** Se os vídeos não carregarem diretamente, estão disponíveis em `docs/videos/`.
 
@@ -33,7 +30,7 @@ https://github.com/user/repo/raw/main/docs/videos/baremetal.mp4
 ## ⚙️ Hardware Utilizado
 
 <div align="center">
-
+    
 | Componente | Função |
 |---|---|
 | **STM32H7** | Microcontrolador principal |
@@ -44,7 +41,6 @@ https://github.com/user/repo/raw/main/docs/videos/baremetal.mp4
 | **LED Vermelho** | Alerta de emergência |
 | **Botão** | Input do utilizador |
 | **LDR** | Sensor de luz (via ADC) |
-
 </div>
 
 ---
@@ -53,6 +49,8 @@ https://github.com/user/repo/raw/main/docs/videos/baremetal.mp4
 
 O comportamento é **idêntico** nas duas implementações:
 
+<div align="center">
+    
 | Ação no botão | O que acontece |
 |---|---|
 | **1 clique** | Buzzer + LED verde piscam a 0.5s (toque intermitente) |
@@ -61,6 +59,7 @@ O comportamento é **idêntico** nas duas implementações:
 | **Pressão longa** | Desliga tudo e reinicia o estado |
 | **USB `ON LDR`** | Ativa sensor de luz — emergência se LDR > 2.5V |
 | **Emergência** | Buzzer contínuo + LED vermelho, tudo bloqueado |
+</div>
 
 ---
 
@@ -133,14 +132,14 @@ osMessagePut(myQueue02Handle, (uint32_t)"ON LED", 10); // USB → LED (emergênc
 | **Escalabilidade** | Difícil de expandir | Fácil de adicionar tarefas |
 | **Uso de memória** | Menor | Maior (stack por tarefa) |
 | **Determinismo** | Depende do loop | Garantido pelo scheduler |
-
 </div>
 
 ---
 
 ## 🧩 Arquitetura — Bare Metal
 
-```
+<div align="center">
+  <pre>
 ┌─────────────────────────────────────────────────────┐
 │                   while(1) loop                     │
 │                                                     │
@@ -154,29 +153,32 @@ osMessagePut(myQueue02Handle, (uint32_t)"ON LED", 10); // USB → LED (emergênc
 │  │ (LED)    │   │ (Buzzer) │                        │
 │  └──────────┘   └──────────┘                        │
 └─────────────────────────────────────────────────────┘
-```
+  </pre>
+</div>
 
 ## 🧩 Arquitetura — FreeRTOS
 
-```
+<div align="center">
+  <pre>
 ┌────────────────────────────────────────────────────────────────┐
 │                        FreeRTOS Scheduler                      │
 │                                                                │
-│  ┌─────────────┐  Queue01  ┌─────────────┐                    │
-│  │  Task01     │──────────►│  Task02     │                    │
-│  │  Button     │           │  Buzzer     │                    │
-│  │ (Normal)    │  Queue02  │(BelowNormal)│                    │
-│  └─────────────┘──────────►┌─────────────┐                    │
-│                            │  Task03     │                    │
-│  ┌─────────────┐  Queue03  │  LED        │                    │
-│  │  Task04     │──────────►│(BelowNormal)│                    │
-│  │  USB + LDR  │           └─────────────┘                    │
-│  │(AboveNormal)│  Queue01+02 ──► (emergência → todas tarefas) │
-│  └─────────────┘                                              │
+│  ┌─────────────┐  Queue01  ┌─────────────┐                     │
+│  │  Task01     │──────────►│  Task02     │                     │
+│  │  Button     │           │  Buzzer     │                     │
+│  │ (Normal)    │  Queue02  │(BelowNormal)│                     │
+│  └─────────────┘──────────►┌─────────────┐                     │
+│                            │  Task03     │                     │
+│  ┌─────────────┐  Queue03  │  LED        │                     │
+│  │  Task04     │──────────►│(BelowNormal)│                     │
+│  │  USB + LDR  │           └─────────────┘                     │
+│  │(AboveNormal)│  Queue01+02 ──► (emergência → todas tarefas)  │
+│  └─────────────┘                                               │
 │                                                                │
-│  Semáforos: ButtonBlock, USBBlock, BuzzerWait, LedWait        │
+│  Semáforos: ButtonBlock, USBBlock, BuzzerWait, LedWait         │
 └────────────────────────────────────────────────────────────────┘
-```
+  </pre>
+</div>
 
 ---
 
@@ -209,7 +211,6 @@ osMessagePut(myQueue02Handle, (uint32_t)"ON LED", 10); // USB → LED (emergênc
 | **FreeRTOS / CMSIS-OS** | Sistema operativo em tempo real |
 | **LCD1602** | Biblioteca de display |
 | **USB CDC** | Comunicação série via USB |
-
 </div>
 
 ---
