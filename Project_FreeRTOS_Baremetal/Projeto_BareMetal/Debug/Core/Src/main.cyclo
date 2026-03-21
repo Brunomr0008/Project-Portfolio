@@ -1,0 +1,15 @@
+../Core/Src/main.c:103:5:main	3
+../Core/Src/main.c:171:6:SystemClock_Config	4
+../Core/Src/main.c:226:6:TaskButton	13
+../Core/Src/main.c:300:6:TaskBuzzer	9
+../Core/Src/main.c:336:6:Action2_TaskBuzzer	5
+../Core/Src/main.c:357:6:TaskLed	9
+../Core/Src/main.c:399:6:Yellow_5Hz	4
+../Core/Src/main.c:415:6:Action2_TaskLed	5
+../Core/Src/main.c:436:6:Action3	7
+../Core/Src/main.c:468:6:TaskUSB	30
+../Core/Src/main.c:581:6:Float_To_String	1
+../Core/Src/main.c:602:6:LCD_Methed	2
+../Core/Src/main.c:619:6:Add_Comand	4
+../Core/Src/main.c:636:6:Remove_Comand	4
+../Core/Src/main.c:654:6:Error_Handler	1

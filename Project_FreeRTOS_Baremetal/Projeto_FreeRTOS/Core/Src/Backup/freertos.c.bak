@@ -1,0 +1,773 @@
+/* USER CODE BEGIN Header */
+/**
+  ******************************************************************************
+  * File Name          : freertos.c
+  * Description        : Code for freertos applications
+  ******************************************************************************
+  * @attention
+  *
+  * Copyright (c) 2024 STMicroelectronics.
+  * All rights reserved.
+  *
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
+  *
+  ******************************************************************************
+  */
+/* USER CODE END Header */
+
+/* Includes ------------------------------------------------------------------*/
+#include "FreeRTOS.h"
+#include "task.h"
+#include "main.h"
+#include "cmsis_os.h"
+
+/* Private includes ----------------------------------------------------------*/
+/* USER CODE BEGIN Includes */
+#include "adc.h"
+#include "gpio.h"
+#include "LCD1602.h"
+#include "Data_Variables.h"
+#include "string.h"
+/* USER CODE END Includes */
+
+/* Private typedef -----------------------------------------------------------*/
+/* USER CODE BEGIN PTD */
+
+/* USER CODE END PTD */
+
+/* Private define ------------------------------------------------------------*/
+/* USER CODE BEGIN PD */
+
+/* USER CODE END PD */
+
+/* Private macro -------------------------------------------------------------*/
+/* USER CODE BEGIN PM */
+
+/* USER CODE END PM */
+
+/* Private variables ---------------------------------------------------------*/
+/* USER CODE BEGIN Variables */
+int8_t button = 0;
+float ldr_value = 0;
+int16_t frequencia_Buzzer = 500;
+int16_t frequencia_Led = 500;
+// Lista para armazenar os comandos ativos
+char comandos_ativos[5][5];
+uint8_t num_comandos_ativos = 0; // Quantidade de comandos ativos
+
+/* USER CODE END Variables */
+osThreadId myTask01_ButtonHandle;
+osThreadId myTask02_BuzzerHandle;
+osThreadId myTask03_LedHandle;
+osThreadId myTask04_USBHandle;
+osMessageQId myQueue01Handle;
+osMessageQId myQueue02Handle;
+osMessageQId myQueue03Handle;
+osMessageQId myQueue04Handle;
+osMessageQId myQueue05Handle;
+osTimerId myTimerMultiAndLongCliquesHandle;
+osTimerId myTimerToqueIntermitenteBuzzerHandle;
+osTimerId myTimerToqueRapido3sBuzzerHandle;
+osTimerId myTimerTask3_1sHandle;
+osTimerId myTimerToqueIntermitenteLedHandle;
+osTimerId myTimerToqueRapido3sLedHandle;
+osSemaphoreId mySemMultiAndLongCliqueHandle;
+osSemaphoreId mySemBuzzerHandle;
+osSemaphoreId mySemLedHandle;
+osSemaphoreId mySemBuzzerWaitHandle;
+osSemaphoreId mySemLedWaitHandle;
+osSemaphoreId mySemButtonBlockHandle;
+osSemaphoreId mySemUSB_BlockHandle;
+
+/* Private function prototypes -----------------------------------------------*/
+/* USER CODE BEGIN FunctionPrototypes */
+void floatToString(float valor, char *str);
+void LCD_methed(uint8_t i);
+void adicionar_comando(char *comando);
+void remover_comando(char *comando);
+/* USER CODE END FunctionPrototypes */
+
+void StartTask01_Button(void const * argument);
+void StartTask02_Buzzer(void const * argument);
+void StartTask03_Led(void const * argument);
+void StartTask04_USB(void const * argument);
+void CallbackMultiAndLongCliques(void const * argument);
+void CallbackToqueIntermitenteBuzzer(void const * argument);
+void CallbackToqueRapido3sBuzzer(void const * argument);
+void CallbackTask3_1s(void const * argument);
+void CallbackToqueIntermitenteLed(void const * argument);
+void CallbackToqueRapido3sLed(void const * argument);
+
+extern void MX_USB_DEVICE_Init(void);
+void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
+
+/* GetIdleTaskMemory prototype (linked to static allocation support) */
+void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer, StackType_t **ppxIdleTaskStackBuffer, uint32_t *pulIdleTaskStackSize );
+
+/* GetTimerTaskMemory prototype (linked to static allocation support) */
+void vApplicationGetTimerTaskMemory( StaticTask_t **ppxTimerTaskTCBBuffer, StackType_t **ppxTimerTaskStackBuffer, uint32_t *pulTimerTaskStackSize );
+
+/* USER CODE BEGIN GET_IDLE_TASK_MEMORY */
+static StaticTask_t xIdleTaskTCBBuffer;
+static StackType_t xIdleStack[configMINIMAL_STACK_SIZE];
+
+void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer, StackType_t **ppxIdleTaskStackBuffer, uint32_t *pulIdleTaskStackSize )
+{
+  *ppxIdleTaskTCBBuffer = &xIdleTaskTCBBuffer;
+  *ppxIdleTaskStackBuffer = &xIdleStack[0];
+  *pulIdleTaskStackSize = configMINIMAL_STACK_SIZE;
+  /* place for user code */
+}
+/* USER CODE END GET_IDLE_TASK_MEMORY */
+
+/* USER CODE BEGIN GET_TIMER_TASK_MEMORY */
+static StaticTask_t xTimerTaskTCBBuffer;
+static StackType_t xTimerStack[configTIMER_TASK_STACK_DEPTH];
+
+void vApplicationGetTimerTaskMemory( StaticTask_t **ppxTimerTaskTCBBuffer, StackType_t **ppxTimerTaskStackBuffer, uint32_t *pulTimerTaskStackSize )
+{
+  *ppxTimerTaskTCBBuffer = &xTimerTaskTCBBuffer;
+  *ppxTimerTaskStackBuffer = &xTimerStack[0];
+  *pulTimerTaskStackSize = configTIMER_TASK_STACK_DEPTH;
+  /* place for user code */
+}
+/* USER CODE END GET_TIMER_TASK_MEMORY */
+
+/**
+  * @brief  FreeRTOS initialization
+  * @param  None
+  * @retval None
+  */
+void MX_FREERTOS_Init(void) {
+  /* USER CODE BEGIN Init */
+
+  /* USER CODE END Init */
+
+  /* USER CODE BEGIN RTOS_MUTEX */
+  /* add mutexes, ... */
+
+  /* USER CODE END RTOS_MUTEX */
+
+  /* Create the semaphores(s) */
+  /* definition and creation of mySemMultiAndLongClique */
+  osSemaphoreDef(mySemMultiAndLongClique);
+  mySemMultiAndLongCliqueHandle = osSemaphoreCreate(osSemaphore(mySemMultiAndLongClique), 1);
+
+  /* definition and creation of mySemBuzzer */
+  osSemaphoreDef(mySemBuzzer);
+  mySemBuzzerHandle = osSemaphoreCreate(osSemaphore(mySemBuzzer), 1);
+
+  /* definition and creation of mySemLed */
+  osSemaphoreDef(mySemLed);
+  mySemLedHandle = osSemaphoreCreate(osSemaphore(mySemLed), 1);
+
+  /* definition and creation of mySemBuzzerWait */
+  osSemaphoreDef(mySemBuzzerWait);
+  mySemBuzzerWaitHandle = osSemaphoreCreate(osSemaphore(mySemBuzzerWait), 1);
+
+  /* definition and creation of mySemLedWait */
+  osSemaphoreDef(mySemLedWait);
+  mySemLedWaitHandle = osSemaphoreCreate(osSemaphore(mySemLedWait), 1);
+
+  /* definition and creation of mySemButtonBlock */
+  osSemaphoreDef(mySemButtonBlock);
+  mySemButtonBlockHandle = osSemaphoreCreate(osSemaphore(mySemButtonBlock), 1);
+
+  /* definition and creation of mySemUSB_Block */
+  osSemaphoreDef(mySemUSB_Block);
+  mySemUSB_BlockHandle = osSemaphoreCreate(osSemaphore(mySemUSB_Block), 1);
+
+  /* USER CODE BEGIN RTOS_SEMAPHORES */
+  /* add semaphores, ... */
+  osSemaphoreWait(mySemMultiAndLongCliqueHandle, 1);
+  osSemaphoreWait(mySemBuzzerHandle, 1);
+  osSemaphoreWait(mySemLedHandle, 1);
+  /* USER CODE END RTOS_SEMAPHORES */
+
+  /* Create the timer(s) */
+  /* definition and creation of myTimerMultiAndLongCliques */
+  osTimerDef(myTimerMultiAndLongCliques, CallbackMultiAndLongCliques);
+  myTimerMultiAndLongCliquesHandle = osTimerCreate(osTimer(myTimerMultiAndLongCliques), osTimerOnce, NULL);
+
+  /* definition and creation of myTimerToqueIntermitenteBuzzer */
+  osTimerDef(myTimerToqueIntermitenteBuzzer, CallbackToqueIntermitenteBuzzer);
+  myTimerToqueIntermitenteBuzzerHandle = osTimerCreate(osTimer(myTimerToqueIntermitenteBuzzer), osTimerPeriodic, NULL);
+
+  /* definition and creation of myTimerToqueRapido3sBuzzer */
+  osTimerDef(myTimerToqueRapido3sBuzzer, CallbackToqueRapido3sBuzzer);
+  myTimerToqueRapido3sBuzzerHandle = osTimerCreate(osTimer(myTimerToqueRapido3sBuzzer), osTimerOnce, NULL);
+
+  /* definition and creation of myTimerTask3_1s */
+  osTimerDef(myTimerTask3_1s, CallbackTask3_1s);
+  myTimerTask3_1sHandle = osTimerCreate(osTimer(myTimerTask3_1s), osTimerPeriodic, NULL);
+
+  /* definition and creation of myTimerToqueIntermitenteLed */
+  osTimerDef(myTimerToqueIntermitenteLed, CallbackToqueIntermitenteLed);
+  myTimerToqueIntermitenteLedHandle = osTimerCreate(osTimer(myTimerToqueIntermitenteLed), osTimerPeriodic, NULL);
+
+  /* definition and creation of myTimerToqueRapido3sLed */
+  osTimerDef(myTimerToqueRapido3sLed, CallbackToqueRapido3sLed);
+  myTimerToqueRapido3sLedHandle = osTimerCreate(osTimer(myTimerToqueRapido3sLed), osTimerOnce, NULL);
+
+  /* USER CODE BEGIN RTOS_TIMERS */
+  /* start timers, add new ones, ... */
+  /* USER CODE END RTOS_TIMERS */
+
+  /* Create the queue(s) */
+  /* definition and creation of myQueue01 */
+  osMessageQDef(myQueue01, 16, uint32_t);
+  myQueue01Handle = osMessageCreate(osMessageQ(myQueue01), NULL);
+
+  /* definition and creation of myQueue02 */
+  osMessageQDef(myQueue02, 16, uint32_t);
+  myQueue02Handle = osMessageCreate(osMessageQ(myQueue02), NULL);
+
+  /* definition and creation of myQueue03 */
+  osMessageQDef(myQueue03, 16, uint32_t);
+  myQueue03Handle = osMessageCreate(osMessageQ(myQueue03), NULL);
+
+  /* definition and creation of myQueue04 */
+  osMessageQDef(myQueue04, 16, uint16_t);
+  myQueue04Handle = osMessageCreate(osMessageQ(myQueue04), NULL);
+
+  /* definition and creation of myQueue05 */
+  osMessageQDef(myQueue05, 16, uint16_t);
+  myQueue05Handle = osMessageCreate(osMessageQ(myQueue05), NULL);
+
+  /* USER CODE BEGIN RTOS_QUEUES */
+  /* add queues, ... */
+  /* USER CODE END RTOS_QUEUES */
+
+  /* Create the thread(s) */
+  /* definition and creation of myTask01_Button */
+  osThreadDef(myTask01_Button, StartTask01_Button, osPriorityNormal, 0, 128);
+  myTask01_ButtonHandle = osThreadCreate(osThread(myTask01_Button), NULL);
+
+  /* definition and creation of myTask02_Buzzer */
+  osThreadDef(myTask02_Buzzer, StartTask02_Buzzer, osPriorityBelowNormal, 0, 128);
+  myTask02_BuzzerHandle = osThreadCreate(osThread(myTask02_Buzzer), NULL);
+
+  /* definition and creation of myTask03_Led */
+  osThreadDef(myTask03_Led, StartTask03_Led, osPriorityBelowNormal, 0, 128);
+  myTask03_LedHandle = osThreadCreate(osThread(myTask03_Led), NULL);
+
+  /* definition and creation of myTask04_USB */
+  osThreadDef(myTask04_USB, StartTask04_USB, osPriorityAboveNormal, 0, 128);
+  myTask04_USBHandle = osThreadCreate(osThread(myTask04_USB), NULL);
+
+  /* USER CODE BEGIN RTOS_THREADS */
+  /* add threads, ... */
+  /* USER CODE END RTOS_THREADS */
+
+}
+
+/* USER CODE BEGIN Header_StartTask01_Button */
+/**
+  * @brief  Function implementing the myTask01_Button thread.
+  * @param  argument: Not used
+  * @retval None
+  */
+/* USER CODE END Header_StartTask01_Button */
+void StartTask01_Button(void const * argument)
+{
+  /* init code for USB_DEVICE */
+  MX_USB_DEVICE_Init();
+  /* USER CODE BEGIN StartTask01_Button */
+  static uint8_t n_button = 0;
+  static uint8_t button_pressed = 0;
+  static uint8_t Start_ToqueIntermitente = 0;
+  static uint8_t toggle_action_2_button = 0;
+  /* Infinite loop */
+  for(;;){
+	// Verifica se o botão foi pressionado
+	if(osSemaphoreWait(mySemButtonBlockHandle, 1) == osOK){
+		if(button == 1){
+			button = 0;
+			n_button++;
+
+			if(n_button == 1){
+				button_pressed = 1;
+				osTimerStart(myTimerMultiAndLongCliquesHandle, 1000); // Timer de múltiplos cliques (1 segundo)
+			}
+		// Verifica se o botão foi solto
+		}else if(button == -1){
+			button = 0;
+			button_pressed = 0;
+		}
+		osSemaphoreRelease(mySemButtonBlockHandle);
+	}
+
+	// Espera pelo semáforo liberado pelo Timer01 (múltiplos cliques)
+	if(osSemaphoreWait(mySemMultiAndLongCliqueHandle, 10) == osOK){
+		if(button_pressed == 0){
+			if(Start_ToqueIntermitente == 0){
+				// Executa ação com base no número de cliques
+				if(n_button == 1){ // Ação para 1 clique
+					Start_ToqueIntermitente = 1;
+					HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_SET);
+
+					osMessagePut(myQueue01Handle, (uint32_t)"ON B", 10);
+					osMessagePut(myQueue02Handle, (uint32_t)"ON L", 10);
+					adicionar_comando("B");
+					adicionar_comando("L");
+				}
+			}else{
+				if(n_button == 2){ // Ação para 2 cliques
+					HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_1);
+					if(toggle_action_2_button ^= 1){
+						osMessagePut(myQueue01Handle, (uint32_t)"ON B2", 10);
+						osMessagePut(myQueue02Handle, (uint32_t)"ON L2", 10);
+						adicionar_comando("B2");
+						adicionar_comando("L2");
+					}else{
+						osMessagePut(myQueue01Handle, (uint32_t)"OFF B2", 10);
+						osMessagePut(myQueue02Handle, (uint32_t)"OFF L2", 10);
+						remover_comando("B2");
+						remover_comando("L2");
+					}
+				}else if(n_button == 3){ // Ação para 3 cliques
+					HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_SET);
+
+					osMessagePut(myQueue01Handle, (uint32_t)"ON B3", 10);
+					osMessagePut(myQueue02Handle, (uint32_t)"ON L3", 10);
+				}
+			}
+		}else{
+			Start_ToqueIntermitente = 0;
+			toggle_action_2_button = 0;
+
+			osMessagePut(myQueue01Handle, (uint32_t)"OFF B", 10);
+			osMessagePut(myQueue02Handle, (uint32_t)"OFF L", 10);
+			remover_comando("B");
+			remover_comando("L");
+			remover_comando("B2");
+			remover_comando("L2");
+
+			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOE, GPIO_PIN_1, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_RESET);
+		}
+
+		// Reseta variáveis
+		n_button = 0;
+	}
+
+	osDelay(30); // Pequeno atraso para evitar uso excessivo de CPU
+  }
+  /* USER CODE END StartTask01_Button */
+}
+
+/* USER CODE BEGIN Header_StartTask02_Buzzer */
+/**
+* @brief Function implementing the myTask02_Buzzer thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartTask02_Buzzer */
+void StartTask02_Buzzer(void const * argument)
+{
+  /* USER CODE BEGIN StartTask02_Buzzer */
+	osEvent evt;
+
+	static int8_t invert = 1;
+	static uint8_t i = 0;
+	static int8_t action_2_buzzer = 0;
+
+  /* Infinite loop */
+  for(;;){
+	  evt = osMessageGet(myQueue01Handle, 10);
+	  if(evt.status == osEventMessage){
+		  uint8_t *val = (uint8_t *)evt.value.p;
+		  if(compare_buf(val, "ON B")){ //(A) toque intermitente 0,5seg - para sempre(1ºaçao)
+			  frequencia_Buzzer = 500;
+			  osTimerStart(myTimerToqueIntermitenteBuzzerHandle, frequencia_Buzzer);
+
+		  }else if(compare_buf(val, "ON B2")){ //aumentar e diminuir frequencia do toque A (diminui o periodo, ou seja mais rapido o toque intermitente)
+			  action_2_buzzer = 1;
+
+		  }else if(compare_buf(val, "ON B3")){ // toque rápido 0,15seg - durante 3seg
+			  if(action_2_buzzer == 1){
+					osSemaphoreWait(mySemBuzzerWaitHandle, 1);
+			  }
+
+			  osTimerStart(myTimerToqueIntermitenteBuzzerHandle, 150);
+			  osTimerStart(myTimerToqueRapido3sBuzzerHandle, 3000);
+
+		  }else if(compare_buf(val, "OFF B")){ // terminar toque
+			  action_2_buzzer = 0;
+			  HAL_GPIO_WritePin(GPIOG, GPIO_PIN_2, GPIO_PIN_RESET);
+			  osTimerStop(myTimerToqueIntermitenteBuzzerHandle);
+
+		  }else if(compare_buf(val, "OFF B2")){ //Desliga a açao 2 do buzzer
+			  action_2_buzzer = 0;
+
+		  }else if(compare_buf(val, "ON BU")){ // situaçao de emergencia, buzzer ativo
+			  HAL_GPIO_WritePin(GPIOG, GPIO_PIN_2, GPIO_PIN_SET);
+
+		  }else if(compare_buf(val, "OFF BU")){ // situaçao de emergencia, buzzer desativo
+			  HAL_GPIO_WritePin(GPIOG, GPIO_PIN_2, GPIO_PIN_RESET);
+		  }
+	  }
+
+
+	  if(action_2_buzzer == 1){
+		  if(osSemaphoreWait(mySemBuzzerHandle, 1) == osOK){
+			  if(osSemaphoreWait(mySemBuzzerWaitHandle, 1) == osOK){
+				  osSemaphoreRelease(mySemBuzzerWaitHandle);
+				  if(i ^= 1){
+					  if(frequencia_Buzzer <= 60){//alta frequencia
+						  invert = 1;
+					  }else if (frequencia_Buzzer >= 760){//baixa frequencia
+						  invert = -1;
+					  }
+
+					  frequencia_Buzzer = frequencia_Buzzer + 20 * invert;
+					  osTimerStart(myTimerToqueIntermitenteBuzzerHandle, frequencia_Buzzer);
+				  }
+			  }
+		  }
+	  }
+
+      osDelay(50);// Pequeno atraso para evitar uso excessivo de CPU
+  }
+  /* USER CODE END StartTask02_Buzzer */
+}
+
+/* USER CODE BEGIN Header_StartTask03_Led */
+/**
+* @brief Function implementing the myTask03_Led thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartTask03_Led */
+void StartTask03_Led(void const * argument)
+{
+  /* USER CODE BEGIN StartTask03_Led */
+	osEvent evt;
+
+	static int8_t invert = 1;
+	static uint8_t i = 0;
+	static int8_t action_2_led = 0;
+
+  /* Infinite loop */
+  for(;;){
+	evt = osMessageGet(myQueue02Handle, 10);
+	if(evt.status == osEventMessage){
+		uint8_t *val = (uint8_t *)evt.value.p;
+		if(compare_buf(val, "ON L")){
+			frequencia_Led = 500;
+			osTimerStart(myTimerToqueIntermitenteLedHandle, frequencia_Led);
+			osTimerStart(myTimerTask3_1sHandle, 1000);
+
+		}else if(compare_buf(val, "ON L2")){
+			action_2_led = 1;
+
+		}else if(compare_buf(val, "ON L3")){
+			if(action_2_led == 1){
+				osSemaphoreWait(mySemLedWaitHandle, 1);
+			}
+
+			osTimerStart(myTimerToqueIntermitenteLedHandle, 150);
+			osTimerStart(myTimerToqueRapido3sLedHandle, 3000);
+
+		}else if(compare_buf(val, "OFF L")){
+			action_2_led = 0;
+			osTimerStop(myTimerToqueIntermitenteLedHandle);
+			osTimerStop(myTimerTask3_1sHandle);
+			HAL_GPIO_WritePin(GPIOC, Green_Pin, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOC, Yellow_Pin, GPIO_PIN_RESET);
+
+		}else if(compare_buf(val, "OFF L2")){
+			action_2_led = 0;
+
+		}else if(compare_buf(val, "ON LED")){ // situaçao de emergencia, Led vermelho ativo
+			HAL_GPIO_WritePin(GPIOC, Red_Pin, GPIO_PIN_SET);
+
+		}else if(compare_buf(val, "OFF LED")){ // situaçao de emergencia, Led vermelho desativo
+			HAL_GPIO_WritePin(GPIOC, Red_Pin, GPIO_PIN_RESET);
+
+		}
+	}
+
+	if(action_2_led == 1){
+		if(osSemaphoreWait(mySemLedHandle, 1) == osOK){
+			if(osSemaphoreWait(mySemLedWaitHandle, 1) == osOK){
+				osSemaphoreRelease(mySemLedWaitHandle);
+				if(i ^= 1){
+					if(frequencia_Led <= 60){//alta frequencia
+						invert = 1;
+					}else if (frequencia_Led >= 760){//baixa frequencia
+						invert = -1;
+					}
+
+					frequencia_Led = frequencia_Led + 20 * invert;
+					osTimerStart(myTimerToqueIntermitenteLedHandle, frequencia_Led);
+				}
+			}
+		}
+	}
+
+	osDelay(50); // Pequeno atraso para evitar uso excessivo de CPU
+  }
+  /* USER CODE END StartTask03_Led */
+}
+
+/* USER CODE BEGIN Header_StartTask04_USB */
+/**
+* @brief Function implementing the myTask04_USB thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartTask04_USB */
+void StartTask04_USB(void const * argument)
+{
+  /* USER CODE BEGIN StartTask04_USB */
+	osEvent evt;
+
+	static uint8_t start_ldr = 0;
+	static uint8_t alarme = 0;
+	static char str[5];
+
+	static uint8_t display_leitura = 0;
+	static uint8_t pisca = 0;
+
+	char *command[10] = {"ON B", "OFF B", "ON B2", "OFF B2", "ON B3", "ON L", "OFF L", "ON L2", "OFF L2", "ON L3"};
+	char *add_command[10] = {"B", "B", "B2", "B2", "", "L", "L", "L2", "L2", ""};
+
+	LCD_methed(0); // LCD on Start
+  /* Infinite loop */
+	for(;;){
+	  	evt = osMessageGet(myQueue03Handle, 10);
+		if(evt.status == osEventMessage){
+			uint8_t *val = (uint8_t *)evt.value.p;
+
+			for(int h = 0; h < 10; h++){
+				if(compare_buf(val, command[h])){ // terminar toque
+					if((h >= 0) && (h <= 4)){
+						osMessagePut(myQueue01Handle, (uint32_t)command[h], 10);
+					}else{
+						osMessagePut(myQueue02Handle, (uint32_t)command[h], 10);
+					}
+
+					if((h == 0) || (h == 2) || (h == 5) || (h == 7)){
+						adicionar_comando(add_command[h]);
+					}else if((h == 1) || (h == 3) || (h == 6) || (h == 8)){
+						remover_comando(add_command[h]);
+					}
+					break;
+				}
+			}
+
+			if(compare_buf(val, "ON LDR")){ // terminar toque
+				if(start_ldr == 0){
+					HAL_ADC_Start_IT(&hadc3);
+
+					start_ldr = 1;
+					LCD_methed(1); // LCD on LDR
+				}
+
+			}else if(compare_buf(val, "OFF LDR")){ // terminar toque
+				HAL_ADC_Stop_IT(&hadc3);
+
+				ldr_value = 0;
+				start_ldr = 0;
+				osMessagePut(myQueue01Handle, (uint32_t)"OFF BU", 10);
+				osMessagePut(myQueue02Handle, (uint32_t)"OFF LED", 10);
+
+				remover_comando("B");
+				remover_comando("B2");
+				remover_comando("L");
+				remover_comando("L2");
+
+				LCD_methed(0); // LCD on Start
+			}
+		}
+
+		if(start_ldr){
+			if(display_leitura++ == 10){
+				display_leitura = 0;
+
+				if(pisca ^= 1){
+					lcd_put_cur(1,15);
+					lcd_send_string("!");
+				}else{
+					lcd_put_cur(1,15);
+					lcd_send_string(".");
+				}
+
+				lcd_put_cur(0,12);
+				floatToString(ldr_value, str);
+				lcd_send_string(str);
+			}
+
+			if(ldr_value > 2.5 && !alarme){
+				osMessagePut(myQueue01Handle, (uint32_t)"OFF B", 10);
+				osMessagePut(myQueue02Handle, (uint32_t)"OFF L", 10);
+
+				osMessagePut(myQueue01Handle, (uint32_t)"ON BU", 10);
+				osMessagePut(myQueue02Handle, (uint32_t)"ON LED", 10);
+
+				osSemaphoreWait(mySemButtonBlockHandle, 1);
+				osSemaphoreWait(mySemUSB_BlockHandle, 1);
+				alarme = 1;
+
+			}else if(ldr_value < 2.2 && alarme){
+				osMessagePut(myQueue01Handle, (uint32_t)"OFF BU", 10);
+				osMessagePut(myQueue02Handle, (uint32_t)"OFF LED", 10);
+
+				osSemaphoreRelease(mySemButtonBlockHandle);
+				osSemaphoreRelease(mySemUSB_BlockHandle);
+
+			    for (int i = 0; i < num_comandos_ativos; i++) {
+			    	if(strcmp(comandos_ativos[i], "B") == 0){
+			    	    osMessagePut(myQueue01Handle, (uint32_t)"ON B", 10);
+			    	}else if(strcmp(comandos_ativos[i], "B2") == 0){
+			    	    osMessagePut(myQueue01Handle, (uint32_t)"ON B2", 10);
+			    	}else if(strcmp(comandos_ativos[i], "L") == 0){
+			    	    osMessagePut(myQueue02Handle, (uint32_t)"ON L", 10);
+			    	}else if(strcmp(comandos_ativos[i], "L2") == 0){
+			    	    osMessagePut(myQueue02Handle, (uint32_t)"ON L2", 10);
+			    	}
+			    }
+
+				alarme = 0;
+			}
+		}
+
+		osDelay(50);
+	}
+  /* USER CODE END StartTask04_USB */
+}
+
+/* CallbackMultiAndLongCliques function */
+void CallbackMultiAndLongCliques(void const * argument)
+{
+  /* USER CODE BEGIN CallbackMultiAndLongCliques */
+	osSemaphoreRelease(mySemMultiAndLongCliqueHandle);
+  /* USER CODE END CallbackMultiAndLongCliques */
+}
+
+/* CallbackToqueIntermitenteBuzzer function */
+void CallbackToqueIntermitenteBuzzer(void const * argument)
+{
+  /* USER CODE BEGIN CallbackToqueIntermitenteBuzzer */
+	HAL_GPIO_TogglePin(GPIOG, GPIO_PIN_2);
+	osSemaphoreRelease(mySemBuzzerHandle);
+  /* USER CODE END CallbackToqueIntermitenteBuzzer */
+}
+
+/* CallbackToqueRapido3sBuzzer function */
+void CallbackToqueRapido3sBuzzer(void const * argument)
+{
+  /* USER CODE BEGIN CallbackToqueRapido3sBuzzer */
+	osSemaphoreRelease(mySemBuzzerWaitHandle);
+	osTimerStart(myTimerToqueIntermitenteBuzzerHandle, frequencia_Buzzer);
+	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_RESET);
+  /* USER CODE END CallbackToqueRapido3sBuzzer */
+}
+
+/* CallbackTask3_1s function */
+void CallbackTask3_1s(void const * argument)
+{
+  /* USER CODE BEGIN CallbackTask3_1s */
+	static uint8_t change_3s = 0;
+
+	HAL_GPIO_WritePin(GPIOC, Yellow_Pin, GPIO_PIN_RESET);
+	if(change_3s++ == 3){
+		change_3s = 0;
+		HAL_GPIO_WritePin(GPIOC, Yellow_Pin, GPIO_PIN_SET);
+	}
+  /* USER CODE END CallbackTask3_1s */
+}
+
+/* CallbackToqueIntermitenteLed function */
+void CallbackToqueIntermitenteLed(void const * argument)
+{
+  /* USER CODE BEGIN CallbackToqueIntermitenteLed */
+	HAL_GPIO_TogglePin(GPIOC, Green_Pin);
+	osSemaphoreRelease(mySemLedHandle);
+  /* USER CODE END CallbackToqueIntermitenteLed */
+}
+
+/* CallbackToqueRapido3sLed function */
+void CallbackToqueRapido3sLed(void const * argument)
+{
+  /* USER CODE BEGIN CallbackToqueRapido3sLed */
+	osSemaphoreRelease(mySemLedWaitHandle);
+	osTimerStart(myTimerToqueIntermitenteLedHandle, frequencia_Led);
+	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_RESET);
+  /* USER CODE END CallbackToqueRapido3sLed */
+}
+
+/* Private application code --------------------------------------------------*/
+/* USER CODE BEGIN Application */
+void floatToString(float valor, char *str) {
+    // Parte inteira do valor
+    int parteInteira = (int)valor;
+    // Calcula a parte fracionária
+    int parteFracionaria = (int)((valor - parteInteira) * 100);
+
+    // Converte a parte inteira para string
+    int indice = 0;
+    str[indice++] = parteInteira + '0';
+
+    // Adiciona o ponto decimal
+    str[indice++] = '.';
+
+    // Converte a parte fracionária para string
+    str[indice++] = ((parteFracionaria / 10) % 10) + '0';
+    str[indice++] = (parteFracionaria % 10) + '0';
+
+    // Finaliza a string
+    str[indice] = '\0';
+}
+
+void LCD_methed(uint8_t i){
+	lcd_clear();
+
+	if(i){
+		lcd_put_cur(0,0);
+		lcd_send_string("LDR Value : ");
+		lcd_put_cur(1,0);
+		lcd_send_string("SE -> FreeRTOS");
+	}else{
+		lcd_put_cur(0,6);
+		lcd_send_string("OFF!");
+		lcd_put_cur(1,0);
+		lcd_send_string("MEEC-> SETR-> G3");
+	}
+}
+
+// Função para adicionar um comando à lista de comandos ativos
+void adicionar_comando(char *comando) {
+    // Verificar se o comando já está ativo
+    for (int i = 0; i < num_comandos_ativos; i++) {
+        if (strcmp(comandos_ativos[i], comando) == 0) {
+            // Se o comando já está ativo, não adiciona novamente
+            return;
+        }
+    }
+
+    // Se o comando não está ativo, adiciona-o à lista
+    if (num_comandos_ativos < 10) {
+        strcpy(comandos_ativos[num_comandos_ativos], comando);
+        num_comandos_ativos++;
+    }
+}
+
+// Função para remover um comando da lista de comandos ativos
+void remover_comando(char *comando) {
+    for (int i = 0; i < num_comandos_ativos; i++) {
+        if (strcmp(comandos_ativos[i], comando) == 0) {
+            // Mover os comandos para preencher o espaço do comando removido
+            for (int j = i; j < num_comandos_ativos - 1; j++) {
+                strcpy(comandos_ativos[j], comandos_ativos[j + 1]);
+            }
+            num_comandos_ativos--;
+            break;
+        }
+    }
+}
+/* USER CODE END Application */
