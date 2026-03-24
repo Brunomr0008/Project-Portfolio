@@ -1,33 +1,12 @@
 # 🏭 Sistema Festo MPS — Controlo de PLC com Automação Avançada
 
-> **Mestrado em Engenharia Eletrotécnica e de Computadores**  
-> Instituto Politécnico do Cávado e do Ave — Escola Superior de Tecnologia  
-> Bruno Rodrigues (31015) · Pedro Rego (14905) · Tiago Miranda (30843)  
-> Docente: Bruno Matos · Julho 2025
-
----
-
-## 📋 Índice
-
-1. [Visão Geral](#-visão-geral)
-2. [Estações MPS](#-estações-mps)
-3. [Arquitetura do Sistema](#-arquitetura-do-sistema)
-4. [Hardware e Software Utilizados](#-hardware-e-software-utilizados)
-5. [Comunicação — O Coração do Projeto](#-comunicação--o-coração-do-projeto)
-   - [FINS/TCP — Comunicação entre PLCs](#finstcp--comunicação-entre-plcs)
-   - [FINS/TCP — Comunicação PC ↔ PLC](#finstcp--comunicação-pc--plc)
-   - [Modbus TCP — Simulação com Factory I/O](#modbus-tcp--simulação-com-factory-io)
-6. [Modos de Operação](#-modos-de-operação)
-7. [Interface Homem-Máquina (HMI)](#-interface-homem-máquina-hmi)
-8. [Simulação — Factory I/O](#-simulação--factory-io)
-9. [Modelação — GRAFCET](#-modelação--grafcet)
-10. [Programação dos PLCs](#-programação-dos-plcs)
-11. [Segurança](#-segurança)
-12. [Testes e Resultados](#-testes-e-resultados)
-13. [Conclusão](#-conclusão)
-14. [Estrutura do Repositório](#-estrutura-do-repositório)
-
----
+![Estação](https://img.shields.io/badge/Estação-Festo%20MPS-blue?style=flat-square)
+![PLC](https://img.shields.io/badge/PLC-Omron%20CJ2M%20%2F%20NX1P2-orange?style=flat-square)
+![Linguagem](https://img.shields.io/badge/Linguagem-Ladder%20%2F%20ST-yellow?style=flat-square)
+![HMI](https://img.shields.io/badge/HMI-C%23%20Visual%20Studio-purple?style=flat-square)
+![Comunicação](https://img.shields.io/badge/Comunicação-FINS%2FTCP%20%7C%20Modbus-red?style=flat-square)
+![Simulação](https://img.shields.io/badge/Simulação-Factory%20I%2FO-lightgrey?style=flat-square)
+![Status](https://img.shields.io/badge/Status-Concluído-brightgreen?style=flat-square)
 
 ## 🎯 Visão Geral
 
@@ -50,15 +29,17 @@ A linha opera de forma **autónoma**, transportando peças, detetando a sua cor 
 
 A estação Pick & Place é responsável pelo **transporte e montagem inicial das peças**. Está equipada com um módulo de dois eixos que retira componentes de uma rampa e os insere em carcaças, que seguem no tapete transportador. Utiliza um sistema de **vácuo** para manipulação precisa e sensores óticos para detetar a presença das peças.
 
-> 📷 *[Figura 1 — Estação de Pick & Place]*  
-> *(Adicionar imagem: `docs/images/pick_and_place.png`)*
+<p align="center">
+  <img src="docs/images/pick_and_place.png" alt="Estação de Pick and Place" width="400"/>
+</p>
 
 ### Estação Handling
 
 A estação Handling tem como função principal a **paletização das peças** provenientes da Pick & Place. Equipada com um sistema elétrico de dois eixos e uma **pinça pneumática**, identifica a cor das peças através de sensores e organiza-as em paletes em conjuntos de quatro, segundo uma sequência definida pelo utilizador. Permite também separação ou encaminhamento para diferentes locais.
 
-> 📷 *[Figura 2 — Estação de Handling]*  
-> *(Adicionar imagem: `docs/images/handling.png`)*
+<p align="center">
+  <img src="docs/images/handling.png" alt="Estação de Handling" width="400"/>
+</p>
 
 ---
 
@@ -66,24 +47,25 @@ A estação Handling tem como função principal a **paletização das peças** 
 
 O sistema é composto por vários subsistemas que comunicam entre si em tempo real:
 
-```
+<div align="center">
+  <pre>
 ┌─────────────────────────────────────────────────────────────────┐
 │                        PC (Windows)                             │
 │                                                                 │
-│   ┌─────────────────────┐      ┌───────────────────────┐       │
-│   │  App C# (HMI)       │      │    Factory I/O        │       │
-│   │  - Supervisão       │      │  (Simulação 3D MPS)   │       │
-│   │  - Controlo Manual  │      │                       │       │
-│   │  - Seleção de Cores │      │  Modbus TCP (porta    │       │
-│   └────────┬────────────┘      │  502, Slave ID:1)     │       │
-│            │ FINS/TCP           └──────────┬────────────┘       │
-│            │ (porta 9600)                  │ Modbus TCP         │
-└────────────│───────────────────────────────│────────────────────┘
-             │                               │
-             │                               ▼
-             │              ┌────────────────────────────┐
-             │              │   PLC — Omron NX1P2        │
-             ▼              │   (Sysmac Studio)          │
+│   ┌─────────────────────┐      ┌───────────────────────┐        │
+│   │  App C# (HMI)       │      │    Factory I/O        │        │
+│   │  - Supervisão       │      │  (Simulação 3D MPS)   │        │
+│   │  - Controlo Manual  │      │                       │        │
+│   │  - Seleção de Cores │      │  Modbus TCP (porta    │        │
+│   └─────────────┬───────┘      │  502, Slave ID:1)     │        │
+│                 │ FINS/TCP     └─────────────┬─────────┘        │
+│                 │ (porta 9600)               │ Modbus TCP       │
+└─────────────────│────────────────────────────│──────────────────┘
+│                           │
+│                           ▼
+              │             ┌────────────────────────────┐
+              │             │   PLC — Omron NX1P2        │
+              ▼             │   (Sysmac Studio)          │
 ┌────────────────────────┐  │   IP: 192.168.250.2        │
 │   PLC — Omron CJ2M     │  │   MASTER (FINS/TCP)        │
 │   (CX-Programmer)      │◄─┤   Cliente (Modbus TCP)     │
@@ -91,13 +73,14 @@ O sistema é composto por vários subsistemas que comunicam entre si em tempo re
 │   SLAVE (FINS/TCP)     │  │   Estação: Handling        │
 │                        │  │   (Garra, Paletização)     │
 │   Estação: Pick&Place  │  └────────────────────────────┘
-│   (Tapete, Vácuo)      │
-└────────────────────────┘
+│   (Tapete, Vácuo)      │                                
+└────────────────────────┘                                
 
         ↕ I/Os Físicos                ↕ I/Os Físicos
-   Sensores · Atuadores          Sensores · Atuadores
-   Pneumática · Tapete           Garra · Plataforma
-```
+      Sensores · Atuadores          Sensores · Atuadores
+    Pneumática · Tapete           Garra · Plataforma
+  </pre>
+</div>
 
 ---
 
@@ -105,29 +88,35 @@ O sistema é composto por vários subsistemas que comunicam entre si em tempo re
 
 ### Hardware
 
-| Componente | Descrição |
-|------------|-----------|
-| **Omron CJ2M** | PLC modular — controla a estação Pick & Place |
-| **Omron NX1P2** | PLC compacto avançado — controla a estação Handling e é o master da comunicação |
-| **ID211** | Carta de entradas digitais |
-| **OD211** | Carta de saídas digitais |
-| **ETN21** | Módulo de comunicação Ethernet |
-| Sensores óticos difusos | Deteção de presença e cor das peças |
-| Fotocélulas e fins de curso | Posição dos atuadores |
-| Cilindros pneumáticos | Movimentação linear |
-| Ventosas e unidade de vácuo | Manipulação de peças |
-| Motores DC | Tapete transportador |
-| Pinça pneumática | Agarrar e largar peças (Handling) |
+<div align="center">
+   
+   | Componente | Descrição |
+   |------------|-----------|
+   | **Omron CJ2M** | PLC modular — controla a estação Pick & Place |
+   | **Omron NX1P2** | PLC compacto avançado — controla a estação Handling e é o master da comunicação |
+   | **ID211** | Carta de entradas digitais |
+   | **OD211** | Carta de saídas digitais |
+   | **ETN21** | Módulo de comunicação Ethernet |
+   | Sensores óticos difusos | Deteção de presença e cor das peças |
+   | Fotocélulas e fins de curso | Posição dos atuadores |
+   | Cilindros pneumáticos | Movimentação linear |
+   | Ventosas e unidade de vácuo | Manipulação de peças |
+   | Motores DC | Tapete transportador |
+   | Pinça pneumática | Agarrar e largar peças (Handling) |
+</div>
 
 ### Software
 
-| Ferramenta | Função |
-|------------|--------|
-| **FluidSIM Pneumática** | Modelação GRAFCET e simulação de circuitos pneumáticos |
-| **CX-Programmer** | Programação em Ladder do PLC Omron CJ2M |
-| **Sysmac Studio** | Programação em Ladder + ST do PLC Omron NX1P2 |
-| **Visual Studio (C#)** | Desenvolvimento da aplicação de supervisão (HMI) |
-| **Factory I/O** | Simulação 3D da linha de fabrico |
+<div align="center">
+
+   | Ferramenta | Função |
+   |------------|--------|
+   | **FluidSIM Pneumática** | Modelação GRAFCET e simulação de circuitos pneumáticos |
+   | **CX-Programmer** | Programação em Ladder do PLC Omron CJ2M |
+   | **Sysmac Studio** | Programação em Ladder + ST do PLC Omron NX1P2 |
+   | **Visual Studio (C#)** | Desenvolvimento da aplicação de supervisão (HMI) |
+   | **Factory I/O** | Simulação 3D da linha de fabrico |
+</div>
 
 ---
 
@@ -135,19 +124,20 @@ O sistema é composto por vários subsistemas que comunicam entre si em tempo re
 
 A comunicação é o elemento mais crítico e complexo deste projeto. Existem **três canais de comunicação distintos**, cada um com um protocolo e propósito diferentes.
 
----
-
 ### FINS/TCP — Comunicação entre PLCs
 
 O protocolo **FINS** (*Factory Interface Network Service*) é o protocolo proprietário da Omron que corre sobre TCP/IP, permitindo troca de dados direta entre equipamentos Omron em redes Ethernet.
 
 **Configuração:**
 
-| Parâmetro | NX1P2 (Master) | CJ2M (Slave) |
-|-----------|----------------|--------------|
-| IP | `192.168.250.2` | `192.168.250.1` |
-| Papel | Inicia comunicação | Responde a pedidos |
-| Gestão | Gere todo o fluxo | Executa comandos recebidos |
+<div align="center">
+   
+   | Parâmetro | NX1P2 (Master) | CJ2M (Slave) |
+   |-----------|----------------|--------------|
+   | IP | `192.168.250.2` | `192.168.250.1` |
+   | Papel | Inicia comunicação | Responde a pedidos |
+   | Gestão | Gere todo o fluxo | Executa comandos recebidos |
+</div>
 
 **Como funciona:**
 
@@ -162,13 +152,9 @@ Os dados transmitidos incluem:
 - **Sequências de paletização** — array de cores enviado pelo C# para o NX1P2 e retransmitido ao CJ2M
 - **Sinais de emergência** — paragem coordenada de ambas as estações
 
-> 📷 *[Figura 51 — Blocos FINS no Sysmac Studio]*  
-> *(Adicionar imagem: `docs/images/fins_communication.png`)*
-
-> 📷 *[Figura 52 — Exemplo de Leitura e Escrita no PLC]*  
-> *(Adicionar imagem: `docs/images/plc_read_write.png`)*
-
----
+<p align="center">
+  <img src="docs/images/fins_communication.png" alt="Blocos FINS no Sysmac Studio" width="500"/>
+</p>
 
 ### FINS/TCP — Comunicação PC ↔ PLC
 
@@ -183,40 +169,43 @@ A aplicação C# comunica diretamente com os PLCs usando também o protocolo **F
 - Alarmes e erros ativos
 - Confirmação de receção da sequência de cores
 
----
-
 ### Modbus TCP — Simulação com Factory I/O
 
 Quando a linha física não está disponível, o Factory I/O substitui o hardware real. A comunicação é feita via **Modbus TCP**, com o NX1P2 configurado como **cliente Modbus** e o Factory I/O como **servidor** (Slave ID: 1, endereço `127.0.0.1`, porta `502`).
 
-> 📷 *[Figura 53 — Bloco Modbus Client no Sysmac Studio]*  
-> *(Adicionar imagem: `docs/images/modbus_communication.png`)*
+<p align="center">
+  <img src="docs/images/modbus_communication.png" alt="Bloco Modbus Client no Sysmac Studio" width="500"/>
+</p>
 
 **Mapeamento de I/Os via Modbus:**
 
 As variáveis do Factory I/O são mapeadas para registos Modbus que o NX1P2 lê e escreve a cada 100 ms:
 
-| Direção | Modbus | Variável | Descrição |
-|---------|--------|----------|-----------|
-| IN | Input 0 | Sensor Deteta Peça Base | Deteção de peça na base |
-| IN | Input 4 | Sensor Início Tapete | Peça no início do tapete |
-| IN | Input 5 | Sensor Leitura Cor | Cor da peça |
-| IN | Input 8 | Sensor Fim Tapete | Peça no fim do tapete |
-| IN | Input 11–13 | Sensores Vácuo (F/T/C) | Estados do sistema de vácuo |
-| IN | Input 17 | Sensor Posição Recolha | Posição de recolha (Handling) |
-| IN | Input 25–27 | Start/Stop/Reset A1 | Botões painel Pick & Place |
-| IN | Input 29–31 | Start/Stop/Reset A2 | Botões painel Handling |
-| OUT | Coil 1 | Pneumático Início | Cilindro inicial |
-| OUT | Coil 3 | Motor Tapete | Liga/desliga tapete |
-| OUT | Coil 9 | Avanço Pneumático Vácuo | Extensão do braço de vácuo |
-| OUT | Coil 10 | Baixa Pneumático Vácuo | Descida do braço de vácuo |
-| OUT | Coil 11 | Vácuo | Ativa ventosa |
-| OUT | Coil 14 | Garra Prende | Fecha pinça |
-| OUT | Coil 15–16 | Plataforma Frente/Trás | Movimento da plataforma |
-| Holding Reg 0–2 | — | Garra X/Y/Z | Posição analógica da garra |
+<div align="center">
 
-> 📷 *[Figura 54/55 — Tabela de I/Os Modbus completa]*  
-> *(Adicionar imagem: `docs/images/modbus_io_mapping.png`)*
+   | Direção | Modbus | Variável | Descrição |
+   |---------|--------|----------|-----------|
+   | IN | Input 0 | Sensor Deteta Peça Base | Deteção de peça na base |
+   | IN | Input 4 | Sensor Início Tapete | Peça no início do tapete |
+   | IN | Input 5 | Sensor Leitura Cor | Cor da peça |
+   | IN | Input 8 | Sensor Fim Tapete | Peça no fim do tapete |
+   | IN | Input 11–13 | Sensores Vácuo (F/T/C) | Estados do sistema de vácuo |
+   | IN | Input 17 | Sensor Posição Recolha | Posição de recolha (Handling) |
+   | IN | Input 25–27 | Start/Stop/Reset A1 | Botões painel Pick & Place |
+   | IN | Input 29–31 | Start/Stop/Reset A2 | Botões painel Handling |
+   | OUT | Coil 1 | Pneumático Início | Cilindro inicial |
+   | OUT | Coil 3 | Motor Tapete | Liga/desliga tapete |
+   | OUT | Coil 9 | Avanço Pneumático Vácuo | Extensão do braço de vácuo |
+   | OUT | Coil 10 | Baixa Pneumático Vácuo | Descida do braço de vácuo |
+   | OUT | Coil 11 | Vácuo | Ativa ventosa |
+   | OUT | Coil 14 | Garra Prende | Fecha pinça |
+   | OUT | Coil 15–16 | Plataforma Frente/Trás | Movimento da plataforma |
+   | Holding Reg 0–2 | — | Garra X/Y/Z | Posição analógica da garra |
+</div>
+
+<p align="center">
+  <img src="docs/images/modbus_io_mapping.png" alt="Tabela de I/Os Modbus completa" width="500"/>
+</p>
 
 **Vantagem desta abordagem:** o programa Ladder corre exatamente igual, seja com hardware físico ou com o simulador. A única diferença está nos valores dos timers, que foram ajustados para os tempos de resposta do ambiente virtual.
 
@@ -253,20 +242,23 @@ A aplicação desenvolvida em **C# (Visual Studio)** centraliza toda a supervis�
 ### Menu Principal
 Mostra logs em tempo real da comunicação FINS com o PLC: estados do sistema, mensagens de erro, alarmes e emergências. Dá acesso às duas funcionalidades principais.
 
-> 📷 *[Figura 48 — Menu Principal da Aplicação]*  
-> *(Adicionar imagem: `docs/images/hmi_main.png`)*
+<p align="center">
+  <img src="docs/images/hmi_main.png" alt="Menu Principal da Aplicação" width="650"/>
+</p>
 
 ### Seleção de Cores
 Painel gráfico com blocos que representam as 4 posições da palete. O operador clica para alternar entre cores (vermelho/preto) e define a sequência de paletização antes de clicar **"Executar — Enviar para o PLC"**. Apenas após confirmação o controlador recebe a configuração.
 
-> 📷 *[Figura 49 — Seleção de Cores]*  
-> *(Adicionar imagem: `docs/images/hmi_colors.png`)*
+<p align="center">
+  <img src="docs/images/hmi_colors.png" alt="Seleção de Cores" width="400"/>
+</p>
 
 ### Controlo Manual de Saídas
 Botões individuais para cada saída digital: transportadores, cilindros pneumáticos, ventosas, stoppers, garra e plataforma. Permite testes sem recorrer ao modo automático.
 
-> 📷 *[Figura 50 — Controlo Manual de Saídas]*  
-> *(Adicionar imagem: `docs/images/hmi_manual.png`)*
+<p align="center">
+  <img src="docs/images/hmi_manual.png" alt="Controlo Manual de Saídas" width="650"/>
+</p>
 
 ---
 
@@ -274,8 +266,9 @@ Botões individuais para cada saída digital: transportadores, cilindros pneumá
 
 Dado que o equipamento físico é partilhado por vários grupos e um dos motores avariou durante o projeto, o **Factory I/O** foi essencial para continuidade do desenvolvimento.
 
-> 📷 *[Figura 56 — Simulação 3D da Linha MPS no Factory I/O]*  
-> *(Adicionar imagem: `docs/images/factory_io.png`)*
+<p align="center">
+  <img src="docs/images/factory_io.png" alt="Simulação 3D da Linha MPS no Factory I/O" width="650"/>
+</p>
 
 A simulação replica fielmente o ambiente físico em 3D:
 - Transportadores e tapete
@@ -301,13 +294,16 @@ Sistema validado → Testar no hardware real (apenas ajustar timers)
 
 O processo foi modelado em **GRAFCET** usando o FluidSIM, organizando a lógica em módulos independentes que funcionam em paralelo:
 
-| Módulo GRAFCET | Função |
-|---------------|--------|
-| **Máquina de Estados** | Estado global do sistema (Reset, Init, Running, Stop, Emergência) |
-| **Início** | Sequência de inicialização do cilindro pneumático Pick & Place |
-| **Tapete** | Controlo do motor do tapete e das pausas durante deteção/transporte |
-| **Vácuo** | Controlo completo do sistema de ventosa (avanço, descida, ativação, recuo) |
-| **Garra** | Controlo da pinça e plataforma da estação Handling com lógica de posicionamento |
+<div align="center">
+
+   | Módulo GRAFCET | Função |
+   |---------------|--------|
+   | **Máquina de Estados** | Estado global do sistema (Reset, Init, Running, Stop, Emergência) |
+   | **Início** | Sequência de inicialização do cilindro pneumático Pick & Place |
+   | **Tapete** | Controlo do motor do tapete e das pausas durante deteção/transporte |
+   | **Vácuo** | Controlo completo do sistema de ventosa (avanço, descida, ativação, recuo) |
+   | **Garra** | Controlo da pinça e plataforma da estação Handling com lógica de posicionamento |
+</div>
 
 Cada GRAFCET foi posteriormente convertido para as equações de estado e implementado em linguagem Ladder nos respetivos PLCs.
 
@@ -326,17 +322,20 @@ Programado em **Ladder** e estruturado em secções:
 
 Mapeamento de I/Os principais do CJ2M:
 
-| Variável | End. | Descrição |
-|----------|------|-----------|
-| `A1_S_IT` | 0.08 | Sensor início tapete |
-| `A1_S_C` | 0.13 | Sensor leitura cor |
-| `A1_S_FT` | 0.14 | Sensor fim tapete (negado) |
-| `A1_S_VPnF/T/C` | 0.09–0.11 | Sensores posição vácuo |
-| `A1_MT` | 1.06 | Motor tapete |
-| `A1_SP` | 1.11 | Stop peça |
-| `A1_V` | 1.12 | Vácuo (ventosa) |
-| `A1_APnV` | 1.07 | Avanço pneumático vácuo |
-| `A1_BPnV` | 1.15 | Baixa pneumático vácuo |
+<div align="center">
+   
+   | Variável | End. | Descrição |
+   |----------|------|-----------|
+   | `A1_S_IT` | 0.08 | Sensor início tapete |
+   | `A1_S_C` | 0.13 | Sensor leitura cor |
+   | `A1_S_FT` | 0.14 | Sensor fim tapete (negado) |
+   | `A1_S_VPnF/T/C` | 0.09–0.11 | Sensores posição vácuo |
+   | `A1_MT` | 1.06 | Motor tapete |
+   | `A1_SP` | 1.11 | Stop peça |
+   | `A1_V` | 1.12 | Vácuo (ventosa) |
+   | `A1_APnV` | 1.07 | Avanço pneumático vácuo |
+   | `A1_BPnV` | 1.15 | Baixa pneumático vácuo |
+</div>
 
 ### Sysmac Studio — Omron NX1P2 (Estação Handling)
 
@@ -363,17 +362,20 @@ END_IF;
 
 Mapeamento de I/Os principais do NX1P2:
 
-| Variável | End. | Descrição |
-|----------|------|-----------|
-| `A2_S_PR` | Bit 00 | Sensor posição recolha |
-| `A2_S_GB` | Bit 05 | Sensor garra baixo |
-| `A2_S_GC` | Bit 04 | Sensor garra cima |
-| `A2_S_GP` | Bit 06 | Sensor garra prende |
-| `A2_GE` | Out 00 | Garra esquerda |
-| `A2_GP` | Out 02 | Garra prender |
-| `A2_GB` | Out 01 | Garra baixo |
-| `A2_PlF` | Out 08 | Plataforma frente |
-| `A2_PlT` | Out 09 | Plataforma trás |
+<div align="center">
+
+   | Variável | End. | Descrição |
+   |----------|------|-----------|
+   | `A2_S_PR` | Bit 00 | Sensor posição recolha |
+   | `A2_S_GB` | Bit 05 | Sensor garra baixo |
+   | `A2_S_GC` | Bit 04 | Sensor garra cima |
+   | `A2_S_GP` | Bit 06 | Sensor garra prende |
+   | `A2_GE` | Out 00 | Garra esquerda |
+   | `A2_GP` | Out 02 | Garra prender |
+   | `A2_GB` | Out 01 | Garra baixo |
+   | `A2_PlF` | Out 08 | Plataforma frente |
+   | `A2_PlT` | Out 09 | Plataforma trás |
+</div>
 
 ---
 
@@ -467,9 +469,10 @@ O projeto atingiu todos os objetivos definidos. A integração entre dois PLCs O
 
 ---
 
-<div align="center">
+## 🏫 Instituição
 
-**Instituto Politécnico do Cávado e do Ave · EST · 2025**  
-*Automação Avançada — Grupo C*
-
-</div>
+**Instituto Politécnico do Cávado e do Ave (IPCA)**  
+Escola Superior de Tecnologia  
+Mestrado em Engenharia Eletrotécnica e de Computadores   
+Bruno Rodrigues (31015) · Pedro Rego (14905) · Tiago Miranda (30843)  
+Docente: Bruno Matos · Julho 2025
