@@ -1,0 +1,19 @@
+DESCR Sperr-/Stromventile
+325 96 1068 1234 0.500000 0 1
+2 1 t1p.ct
+3 1 t2p.ct
+4 1 pth1.ct
+5 1 sf9.ct
+1 2 pof1.ct
+2 2 pof2.ct
+3 2 sf4.ct
+4 2 sf1.ct
+5 2 sf2.ct
+1 3 sf3.ct
+2 3 sf2a.ct
+3 3 sf2b.ct
+4 3 sf5a.ct
+5 3 sf5d.ct
+1 4 sf5b.ct
+2 4 sf5c.ct
+3 4 sf7.ct

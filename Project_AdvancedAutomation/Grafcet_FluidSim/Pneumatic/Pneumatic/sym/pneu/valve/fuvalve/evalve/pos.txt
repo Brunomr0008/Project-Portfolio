@@ -1,0 +1,10 @@
+DESCR Elektromagnetisch betätigt
+325 96 1068 1234 0.500000 0 1
+2 1 mi1.ct
+3 1 el2.ct
+4 1 el1.ct
+5 1 el3.ct
+1 2 el4.ct
+2 2 el5.ct
+3 2 el6.ct
+4 2 el7.ct
