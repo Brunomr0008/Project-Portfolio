@@ -1,12 +1,10 @@
 # 🔬 Classificação de Materiais via TinyML — Fusão de Dados
 
-> **Mestrado em Engenharia Eletrónica e de Computadores** | IPCA — Instituto Politécnico do Cávado e do Ave  
-> **Unidade Curricular:** Fusão de Dados  
-> **Autores:** Bruno Rodrigues (31015) · Pedro Rego (14905)  
-> **Docente:** Prof. José Brito  
-> **Data:** 16 de dezembro de 2025
-
----
+![ESP32](https://img.shields.io/badge/ESP32-Xtensa_LX6-red?style=flat-square)
+![Python](https://img.shields.io/badge/Python-3.11-blue?style=flat-square)
+![Keras](https://img.shields.io/badge/Keras-TensorFlow-red?style=flat-square)
+![Scikit-Learn](https://img.shields.io/badge/Scikit--Learn-ML-green?style=flat-square)
+![C++](https://img.shields.io/badge/C++-Arduino/ESP--IDF-blue?style=flat-square)
 
 ## 📋 Descrição do Projeto
 
@@ -62,9 +60,9 @@ Para garantir o balanceamento, foi aplicado um limite de **500 amostras por clas
 
 O dataset final consolidou **30.000 amostras** (10.000 por classe), distribuídas de forma perfeitamente equilibrada:
 
-![Número de amostras por classe](images/figura1_dataset.jpg)
-
-*Figura 1 — Distribuição de amostras por classe material*
+<p align="center">
+  <img src="docs/images/dataset.png" alt="Número de amostras por classe" width="700"/>
+</p>
 
 A feature **Metal** foi removida após análise de variância, por apresentar desvio padrão ≈ 0 (constante), o que colapsa o StandardScaler. O conjunto final de features válidas é:
 
@@ -86,9 +84,9 @@ z = (x − μ) / σ
 
 Foram comparados vários algoritmos de Machine Learning (média de 5 execuções independentes):
 
-![Comparação de Modelos](images/figura2_comparacao_modelos.jpg)
-
-*Figura 2 — Comparação de Accuracy entre modelos (Scikit-Learn)*
+<p align="center">
+  <img src="docs/images/comparacao_modelos.png" alt="Comparação de Accuracy entre modelos (Scikit-Learn)" width="700"/>
+</p>
 
 Os modelos com capacidade de modelar relações não-lineares — **SVC (Kernel RBF)** e **MLP** — obtiveram o melhor desempenho (~98.5%). O **MLP em TensorFlow/Keras** foi escolhido para produção pelas seguintes razões:
 
@@ -116,17 +114,17 @@ Input (4) → Dense 128 (ReLU) → Dense 64 (ReLU) → Output 3 (Softmax)
 
 ### Curvas de Convergência
 
-![Curvas de Treino](images/figura3_curvas_treino.jpg)
-
-*Figura 3 — Curvas de Loss e Accuracy ao longo de 400 epochs*
+<p align="center">
+  <img src="docs/images/curvas_treino.jpeg" alt="Curvas de Loss e Accuracy ao longo de 400 epochs" width="700"/>
+</p>
 
 As curvas de treino e teste evoluem em paralelo, confirmando **ausência de overfitting**.
 
 ### Resultado Final
 
-![Matriz de Confusão](images/figura4_matriz_confusao.jpg)
-
-*Figura 4 — Matriz de Confusão e Accuracy final do modelo Keras MLP*
+<p align="center">
+  <img src="docs/images/matriz_confusao.png" alt="Matriz de Confusão e Accuracy final do modelo Keras MLP" width="600"/>
+</p>
 
 **Accuracy no conjunto de teste: 98.90%**
 
@@ -164,11 +162,20 @@ A função `runInference()` pode ser ativada remotamente via rota HTTP `/classif
 
 ---
 
-## 🛠️ Stack Tecnológico
+## 👨‍💻 Autores
 
-![ESP32](https://img.shields.io/badge/ESP32-Xtensa_LX6-red?style=flat-square)
-![TensorFlow Lite](https://img.shields.io/badge/TensorFlow_Lite-Microcontrollers-orange?style=flat-square)
-![Python](https://img.shields.io/badge/Python-3.x-blue?style=flat-square)
-![Keras](https://img.shields.io/badge/Keras-TensorFlow-red?style=flat-square)
-![Scikit-Learn](https://img.shields.io/badge/Scikit--Learn-ML-green?style=flat-square)
-![C++](https://img.shields.io/badge/C++-Arduino/ESP--IDF-blue?style=flat-square)
+| Nome | Número |
+|---|---|
+| Bruno Rodrigues | N.º 31015 |
+| Pedro Rego | N.º 14905 |
+
+**Orientador:** Professor José Brito  
+**Data:** dezembro de 2025
+
+---
+
+## 🏫 Instituição
+
+**Instituto Politécnico do Cávado e do Ave (IPCA)**  
+Escola Superior de Tecnologia  
+Mestrado em Engenharia Eletrotécnica e de Computadores
